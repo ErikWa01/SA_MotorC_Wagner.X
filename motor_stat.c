@@ -8,6 +8,7 @@
 #include <math.h>
 #include "p30F4011.h"
 
+// Test
 
 /* Funktion zur Initialisierung der Hall-Sensoren */
 void HallSensor_Init() {
