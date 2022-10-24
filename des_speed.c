@@ -11,7 +11,7 @@
 
 
 /* Deklaration von Variablen */
-float speed = 9;            // Geschwindigkeit der Rotation
+float speed = 1;            // Geschwindigkeit der Rotation
 char richtung = 'v';              // Richtung der Rotation
 float command_speed = 1;
 
