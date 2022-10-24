@@ -66,7 +66,6 @@ int main() {
     
     while (1)
     {
-        handle_msg_rx();
         motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
     }
     

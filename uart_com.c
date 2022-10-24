@@ -74,10 +74,6 @@ void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt(void) {
     IFS1bits.U2RXIF = 0;    // RX-Interrupt-Flag l√∂schen
     msg_uart_rx[0] = U2RXREG;    // Empfangen der gesendeten Daten und Abspeichern in Variable Empfangsarray zur Weiterverwendung
     msg_uart_rx[1] = '\0';       // Definiertes Ende des Arrays
-}
-
-/* Funktion zur ‹bergabe der empfangenen Kommandobefehle */
-char *get_msg_rx()
-{
-    return msg_uart_rx;
+    
+    handle_msg_rx(msg_uart_rx);
 }

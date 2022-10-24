@@ -35,9 +35,9 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 }
 
 /* Funktion zur Auswertung der �ber UART Empfangenen Nachricht */
-void handle_msg_rx()
+void handle_msg_rx(char *msg)
 {
-    msg_rx = get_msg_rx();
+    msg_rx = msg;
     // Falls 'msg_rx[0]' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
     if (msg_rx[0] == 118 || msg_rx[0] == 114) {
         // �?berprüfung einer gewünschten Richtungsänderung durch Vergleich zwischen Kommandobefehl und aktueller Drehrichtung
