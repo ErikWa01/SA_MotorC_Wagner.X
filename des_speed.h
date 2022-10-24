@@ -13,9 +13,10 @@ extern "C" {
 #endif
     
     /* Funktionsprototypen */
-    void handleCommand(char command);
     char getDesRichtung();
     float getDesSpeed();
+    void set_des_dir(char desRtg);
+    void set_des_speed(float des_speed);
 
 #ifdef	__cplusplus
 }

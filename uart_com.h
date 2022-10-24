@@ -15,7 +15,8 @@ extern "C" {
 void UART2_Init();
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt(void);
 void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt(void);
-char get_command();
+char *get_msg_rx();
+void send_msg(char *msg);
 
 
 #ifdef	__cplusplus

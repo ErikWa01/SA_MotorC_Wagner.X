@@ -12,7 +12,9 @@
 extern "C" {
 #endif
 
-
+    void com_interface_init();
+    void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void);
+    void handle_msg_rx();
 
 
 #ifdef	__cplusplus

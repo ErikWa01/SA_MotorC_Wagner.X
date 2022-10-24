@@ -13,35 +13,25 @@
 /* Deklaration von Variablen */
 float speed = 1;            // Geschwindigkeit der Rotation
 char richtung = 'v';              // Richtung der Rotation
-float command_speed = 1;
 
-
-/* Funktion zur Auswertung des �ber UART Empfangenen Kommandos */
-void handleCommand(char command)
+// Funktion zum setzen einer neuen Drehrichtung
+void set_des_dir(char desRtg)
 {
-    // Falls 'command' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
-    if (command == 118 || command == 114) {
-        // �?berprüfung einer gewünschten Richtungsänderung durch Vergleich zwischen Kommandobefehl und aktueller Drehrichtung
-        if (command != richtung) {
-
-            //Kurzeitiges Verlangsamen des Motors
-            speed = 1;
-            // Aktualisierung der Richtung
-            richtung = command;
-        }
-    } 
-        
-    // Falls 'command' keine der beiden Buchstaben 'v' oder 'r' enthält, könnte Befehl eine Geschwindigkeitsänderung sein... 
-    else {
-        // Umwandlung von char 'command' in eine integer-Variable 'command_speed'
-        command_speed = command - 48;
-
-        // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gewünschte Geschwindigkeitsänderung gesendet
-        if (command_speed >= 0 && command_speed <= 9) {
-            speed = command_speed;      // Aktualisierung der Geschwindigkeit
-        }
+    if (desRtg != richtung)
+    {
+        //Kurzeitiges Verlangsamen des Motors
+        speed = 1;
+        // Aktualisierung der Richtung
+        richtung = desRtg;
     }
 }
+
+// Funktion zum setzen einer neuen Geschwindigkeit
+void set_des_speed(float des_speed)
+{
+    speed = des_speed;
+}
+
 
 char getDesRichtung()
 {

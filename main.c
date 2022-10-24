@@ -62,10 +62,11 @@ int main() {
     PWM_Init();         // Initialisierung der PWM
     HallSensor_Init();  // Initialisierung der Hall-Sensoren
     UART2_Init();       // Initialisierung des UART2-Moduls
+    com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
     
     while (1)
     {
-        handleCommand(get_command());
+        handle_msg_rx();
         motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
     }
     
