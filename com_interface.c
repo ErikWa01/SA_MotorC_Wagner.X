@@ -55,3 +55,12 @@ void handle_msg_rx(char *msg)
         }
     }
 }
+
+// Funktion zum Senden des Stromes
+void send_current(int I)
+{
+    msg_tx[0] = (I & 0x0300) >> 8;
+    msg_tx[1] = (I & 0x00FF);
+    msg_tx[2] = '\0';
+    send_msg(msg_tx);
+}

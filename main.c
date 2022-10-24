@@ -60,7 +60,7 @@
  */
 int main() {
     PWM_Init();         // Initialisierung der PWM
-    HallSensor_Init();  // Initialisierung der Hall-Sensoren
+    motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     UART2_Init();       // Initialisierung des UART2-Moduls
     com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
     

@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-void HallSensor_Init();
+void motor_stat_init();
 int read_HallSensors();
 
 
