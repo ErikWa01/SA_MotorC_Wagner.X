@@ -14,6 +14,7 @@ extern "C" {
 
 void motor_stat_init();
 int read_HallSensors();
+void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void);
 
 
 #ifdef	__cplusplus

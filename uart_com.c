@@ -33,7 +33,9 @@ void UART2_Init() {
     U2MODEbits.UARTEN = 1;  // UART aktivieren
     U2STAbits.UTXEN = 1;    // UART-Ã?bertragung aktivieren
 
-    IEC1bits.U2TXIE = 1;    // Aktivieren des TX-Interrupts zum Senden
+    IFS1bits.U2TXIF = 0;    // Rücksetzen des Interrupt-Flags für TX
+    IFS1bits.U2RXIF = 0;    // Rücksetzen des Interrupt-Flags für RX
+    IEC1bits.U2TXIE = 0;    // Aktivieren des TX-Interrupts zum Senden
     IEC1bits.U2RXIE = 1;    // Aktivieren des RX-Interrupts zum Empfangen
 
     U2STAbits.URXISEL = 1;  // Einstellung des RX-Interrupts - Interrupt wird jedes Mal erzeugt, wenn ein Datenwort aus dem Empfangs-Schieberegister (UxRSR) in den Empfangspuffer Ã¼bertragen wird
