@@ -21,11 +21,13 @@ void motor_stat_init() {
 //     Konfiguration des AD-Konverters zur Strommessung
     ADPCFG = 0xFFFB;        // Alle Inputs Digital, außer AN2
     ADCHSbits.CH0SA = 0x2;  // Positive Input in CH0 is AN2 (Strommesspin)
-    ADCON3bits.SAMC = 0x1;  // Auto-Sample Time = 1 Tad
-    ADCON3bits.ADCS = 0x2;  // Einstellen der Tad auf min. 83,33 ns
-    ADCON2bits.SMPI = 0xF;  // Ausloesen eines Interrupts erst nach 16 Sample/Convert Durchlaeufen
+    ADCON3bits.SAMC = 0x01; // Auto-Sample Time = 1 Tad
+    ADCON3bits.ADCS = 0x2;  // Einstellen der Tad auf min. 83,33 ns --> Wert ist: 93,75 ns
+    ADCON2bits.SMPI = 0x0;  // Ausloesen eines Interrupts nach 1 Sample/Convert Durchlauf
     ADCON1bits.ASAM = 1;    // Auto-Start Sampling
     ADCON1bits.SSRC = 0x7;  // Auto Convert
+    IFS0bits.ADIF = 0;          // Ruecksetzen des ADC-Interrupt-Flags
+    IEC0bits.ADIE = 1;          // Aktivieren der ADC-Interrupts
     ADCON1bits.ADON = 1;    // Aktivierung des ADC
 }
 
