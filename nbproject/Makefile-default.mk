@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/uart_com.o.d ${OBJECTDIR}/motor_stat.o.d ${OBJECTDIR}/commutation.o.d ${OBJECTDIR}/des_speed.o.d ${OBJECTDIR}/com_interface.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/uart_com.o.d ${OBJECTDIR}/motor_stat.o.d ${OBJECTDIR}/commutation.o.d ${OBJECTDIR}/des_speed.o.d ${OBJECTDIR}/com_interface.o.d ${OBJECTDIR}/scheduler.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o
 
 # Source Files
-SOURCEFILES=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c
+SOURCEFILES=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c
 
 
 
@@ -131,6 +131,12 @@ ${OBJECTDIR}/com_interface.o: com_interface.c  .generated_files/flags/default/44
 	@${RM} ${OBJECTDIR}/com_interface.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  com_interface.c  -o ${OBJECTDIR}/com_interface.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/com_interface.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
+${OBJECTDIR}/scheduler.o: scheduler.c  .generated_files/flags/default/8eef918214354f043fae06f8a3983c11638867bc .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/scheduler.o.d 
+	@${RM} ${OBJECTDIR}/scheduler.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  scheduler.c  -o ${OBJECTDIR}/scheduler.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/scheduler.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
 else
 ${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/fedba979e906ad77ef1c6a22b61be7f474ba4202 .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
 	@${MKDIR} "${OBJECTDIR}" 
@@ -167,6 +173,12 @@ ${OBJECTDIR}/com_interface.o: com_interface.c  .generated_files/flags/default/41
 	@${RM} ${OBJECTDIR}/com_interface.o.d 
 	@${RM} ${OBJECTDIR}/com_interface.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  com_interface.c  -o ${OBJECTDIR}/com_interface.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/com_interface.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
+${OBJECTDIR}/scheduler.o: scheduler.c  .generated_files/flags/default/4894a5392a5fcbb274211658be1144aa3f7bf304 .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/scheduler.o.d 
+	@${RM} ${OBJECTDIR}/scheduler.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  scheduler.c  -o ${OBJECTDIR}/scheduler.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/scheduler.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 endif
 

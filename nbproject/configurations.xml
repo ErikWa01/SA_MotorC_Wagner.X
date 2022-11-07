@@ -10,6 +10,7 @@
       <itemPath>des_speed.h</itemPath>
       <itemPath>global_const.h</itemPath>
       <itemPath>com_interface.h</itemPath>
+      <itemPath>scheduler.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -24,6 +25,7 @@
       <itemPath>commutation.c</itemPath>
       <itemPath>des_speed.c</itemPath>
       <itemPath>com_interface.c</itemPath>
+      <itemPath>scheduler.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

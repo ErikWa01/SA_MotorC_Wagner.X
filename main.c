@@ -53,6 +53,7 @@
 #include "des_speed.h"
 #include "com_interface.h"
 #include "global_const.h"
+#include "scheduler.h"
 
 //int temp;
 int count = 0;
