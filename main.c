@@ -44,6 +44,7 @@
 #include <xc.h>
 #include <libpic30.h>
 #include <math.h>
+#include "p30F4011.h"
 
 // Eigene Header
 #include "uart_com.h"
@@ -52,8 +53,8 @@
 #include "des_speed.h"
 #include "com_interface.h"
 #include "global_const.h"
-#include "p30F4011.h"
-int temp;
+
+//int temp;
 int count = 0;
 int value = 0;
 
@@ -65,23 +66,24 @@ int main() {
     motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     UART2_Init();       // Initialisierung des UART2-Moduls
     com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
-    temp = ADCBUF0;
+//    temp = ADCBUF0;
 
     while (1)
     {
-        if(temp != ADCBUF0)
-        {
-            if(count == 0){
-                T1CON = 0x8000;
-                count++;
-                temp = ADCBUF0;
-            }else if(count == 1)
-            {
-                value = TMR1;
-                T1CON = 0x0000;
-            }
-        }
+//        if(temp != ADCBUF0)
+//        {
+//            if(count == 0){
+//                T1CON = 0x8000;
+//                count++;
+//                temp = ADCBUF0;
+//            }else if(count == 1)
+//            {
+//                value = TMR1;
+//                T1CON = 0x0000;
+//            }
+//        }
         motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
+        calc_I_from_ADval();
     }
     
     return (EXIT_SUCCESS);

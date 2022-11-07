@@ -9,6 +9,7 @@
 #include <libpic30.h>
 #include <math.h>
 #include "p30F4011.h"
+#include "com_interface.h"
 
 /* Definition von Konstanten */
 #define BAUD 9600           // Definition der Baudrate
@@ -18,7 +19,7 @@ uint16_t Predefiner = ((FCY / BAUD) / 16) - 1; // Einstellen der Baudrate
 
 int msg_count = 0;          // Laufvariable zum Durchlaufen der Char-Arrays der zu sendenden Nachrichten
 char *msg_uart_tx;               // Pointer auf Anfang des Char-Arrays einer zu sendenen Nachricht
-int send_msg_flag = 0;      // Flag zum erkennen ob Nachricht gesendet werden soll oder nicht
+int send_msg_flag;      // Flag zum erkennen ob Nachricht gesendet werden soll oder nicht
 char msg_uart_rx[];               // Pointer auf Anfang des Char-Arrays einer empfangenen Nachricht
 
 
@@ -35,7 +36,7 @@ void UART2_Init() {
 
     IFS1bits.U2TXIF = 0;    // Rücksetzen des Interrupt-Flags für TX
     IFS1bits.U2RXIF = 0;    // Rücksetzen des Interrupt-Flags für RX
-    IEC1bits.U2TXIE = 0;    // Aktivieren des TX-Interrupts zum Senden
+    IEC1bits.U2TXIE = 1;    // Aktivieren des TX-Interrupts zum Senden
     IEC1bits.U2RXIE = 1;    // Aktivieren des RX-Interrupts zum Empfangen
 
     U2STAbits.URXISEL = 1;  // Einstellung des RX-Interrupts - Interrupt wird jedes Mal erzeugt, wenn ein Datenwort aus dem Empfangs-Schieberegister (UxRSR) in den Empfangspuffer Ã¼bertragen wird
@@ -43,6 +44,8 @@ void UART2_Init() {
     msg_uart_tx[0] = '\0';       // Initialisierung des Arrays als leeren Strings
     msg_uart_rx[0] = 'v';        // Initialisierung des Empfangs-Arrays mit 'v' fuer Vorwaertsbewegung
     msg_uart_rx[1] = '\0';
+    
+    send_msg_flag = 0;
 }
 
 void send_msg(char *msg)
@@ -78,4 +81,10 @@ void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt(void) {
     msg_uart_rx[1] = '\0';       // Definiertes Ende des Arrays
     
     handle_msg_rx(msg_uart_rx);
+}
+
+
+int get_send_msg_flag()
+{
+    return send_msg_flag;
 }

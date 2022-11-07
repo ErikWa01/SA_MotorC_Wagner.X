@@ -18,21 +18,21 @@ float des_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 // Funktion zur Initialisierung der Kommunikationssteuerung
 void com_interface_init()
 {
-    //CNEN1 = 0xE0; // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
-    //IFS0bits.CNIF = 0; // Loeschen moeglicher ausgeloester Interrupts
-    //IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
+    CNEN1 = 0xE0; // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
+    IFS0bits.CNIF = 0; // Loeschen moeglicher ausgeloester Interrupts
+    IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
     // msg_tx = "";
 }
 
 // Senden der Hall-Sensoren sobald Statusaenderung
-//void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
-//{
-//    IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
-//    
-//    msg_tx[0] = read_HallSensors();
-//    msg_tx[1] = '\0';
-//    send_msg(msg_tx);
-//}
+void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
+{
+    IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
+    
+    msg_tx[0] = read_HallSensors();
+    msg_tx[1] = '\0';
+    send_msg(msg_tx);
+}
 
 /* Funktion zur Auswertung der über UART Empfangenen Nachricht */
 void handle_msg_rx(char *msg)
@@ -57,10 +57,11 @@ void handle_msg_rx(char *msg)
 }
 
 // Funktion zum Senden des Stromes
-void send_current(int I)
-{
-    msg_tx[0] = (I & 0xFF00) >> 8;
-    msg_tx[1] = (I & 0x00FF);
-    msg_tx[2] = '\0';
-    send_msg(msg_tx);
-}
+//void send_current(int I)
+//{
+//    msg_tx[0] = (I & 0xFF00) >> 8;
+//    msg_tx[1] = (I & 0x00FF);
+//    msg_tx[2] = '\0';
+//    if(get_send_msg_flag() == 0)
+//        send_msg(msg_tx);
+//}

@@ -16,6 +16,7 @@ void UART2_Init();
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt(void);
 void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt(void);
 void send_msg(char *msg);
+int get_send_msg_flag();
 
 
 #ifdef	__cplusplus

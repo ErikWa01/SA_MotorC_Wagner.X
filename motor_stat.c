@@ -10,9 +10,11 @@
 #include "com_interface.h"
 
 // Variablendeklaration
-int I_motor = 0;
+int I_motor_ADval = 0;
+double I_motor_double;
 int *AD_Buf_ptr;
 int measure_count = 0;
+int is_wandling;
 
 /* Funktion zur Initialisierung der Hall-Sensoren */
 void motor_stat_init() {
@@ -45,22 +47,27 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void)
     int i;
     
     IFS0bits.ADIF = 0;              // Ruecksetzen des Interrupt-Flags
+    is_wandling = 1;
     
-    if(measure_count = 0)           // Pruefen ob ersten 8 der 16 moeglichen Buffer ausgelesen werden sollen
-    {
-        AD_Buf_ptr = &ADCBUF0;      // Wenn ja, setzen des Buffer-Pointers auf Buffer 0
-        measure_count = 1;          // Kennzeichen, dass das naechste mal zweiten 8 Buffer gelesen werden sollen
-    }else if(measure_count = 1){    // Pruefen ob zweiten 8 Buffer gelesen werden sollen
-        AD_Buf_ptr = &ADCBUF8;      // Wenn ja, setzen des Buffer-Pointers auf Buffer 8
-        measure_count = 0;          // Kennzeichen, dass naechste mal wieder die ersten 8 gelesen werden sollen
-    }
+     AD_Buf_ptr = &ADCBUF0;          // Setzen des Buffer-Pointers auf Buffer 0
+     I_motor_ADval = 0;
+//    I_motor = ADCBUF0;
     
     /* Durchlaufen von 8 Buffern und bilden des Mittelwerts */
     for(i = 0; i < 8; i++)
     {
-        I_motor = I_motor + *AD_Buf_ptr++;
+        I_motor_ADval = I_motor_ADval + *AD_Buf_ptr++;
     }
-    I_motor = I_motor / 8;
+    I_motor_ADval = I_motor_ADval / 8;
+    is_wandling = 0;
+
+    send_current(I_motor_ADval);          // Senden des gemessenen Stromwertes
+}
+
+// Berechnen des Stromes anhand dem Wert des AD-Wandlers
+double calc_I_from_ADval()
+{
+    I_motor_double = (I_motor_ADval - 503) * (25.0/256.0);      // Formel zur Berechnung des Stromwertes (beruecksichtigt Gain und Offset des Verstärkers, sowie Groeße des Shuntwiderstands)
     
-    send_current(I_motor);          // Senden des gemessenen Stromwertes
+    return I_motor_double;
 }
