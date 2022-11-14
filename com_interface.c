@@ -9,6 +9,7 @@
 #include "motor_stat.h"
 #include "uart_com.h"
 #include "des_speed.h"
+#include "adc_module.h"
 
 // Variablendeklaration
 char msg_tx[]; // Pointer für char-Arrays, zum Speichern der zusendenden Nachrichten
@@ -21,7 +22,7 @@ void com_interface_init()
     CNEN1 = 0xE0; // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
     IPC3bits.CNIP = 6;  // Setzen der Interrupt-Prioritaet auf die Hoechste
     IFS0bits.CNIF = 0; // Loeschen moeglicher ausgeloester Interrupts
-    IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
+//    IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
     // msg_tx = "";
 }
 
@@ -58,10 +59,59 @@ void handle_msg_rx(char *msg)
 }
 
 // Funktion zum Senden des Stromes
-void send_current(int I)
+void send_current()
 {
-    msg_tx[0] = (I & 0xFF00) >> 8;  // Speichern des oberen Bytes des AD-Hexwertes in zuerst zu sendendem char
-    msg_tx[1] = (I & 0x00FF);       // Speichern des unteren Bytes des AD-Hexwertes in als zweites zu sendendem char
-    msg_tx[2] = '\0';               // Abschließen des char-Arrays
+    int I;
+    int string_ende;
+    
+    I = get_I_motor_ADval() - 506;  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
+    
+    string_ende = itoa(I, msg_tx);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
+    msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
+    msg_tx[string_ende] = '\0';     // Setzen des Ende des Strings
+    
     send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
+}
+
+/* Funktion zum Umwandeln eines signed Integer in einen String
+ * 
+ * Übergabeparameter:
+ *  - value: der zu wandelnde Integerwert
+ *  - str: pointer auf die Speicheradresse, die erstes Byte des Strings enthalten soll
+ * 
+ * Rückgabeparameter:
+ *  - Integerwert, der auf die letzte Speicheradresse des Strings zeigt
+ */
+int itoa(int value, char *str)
+{
+    int i = 0;              // Laufvariable
+    int divisor = 10000;    // Durch diesen Wert wird der Int-Wert geteilt
+    int printed = 0;        // Erkennung, ob bereits eine Ziffer gespeichert wurde
+    
+    // Pruefen, ob die Zahl negativ ist
+    if(value < 0)
+    {
+        str[i] = '-';       // Ist die Zahl negativ wird ein Minus gespeichert
+        value = -value;     // und der Betrag der Zahl fuer die weitere Verarbeitung gebildet
+        i++;
+    }
+    
+    // Solange Divisor mindestens 1 ist, sind noch Ziffern zu speichern
+    while(divisor > 0)
+    {
+        // Gespeichert wird eine Ziffer nur, wenn die an der Stelle mit der Wertigkeit des Divisors eine Ziffer > 0 ist,
+        // bereits eine Ziffer gespeichert wurde oder der Divisor 1 ist (Dann ist die Zahl 0)
+        if(value/divisor || printed || divisor == 1)
+        {
+            str[i] = value/divisor + '0';   // Extrahieren der Stelle mit der Wertigkeit des Divisors und umwandeln in ASCII-Code
+            value = value % divisor;        // Bilden des noch zu wandelnden Wertes durch Modulo-Operation 
+            printed = 1;                    // Erkennung, dass bereits eine Ziffer gespeichert wurde
+            i++;                            // Erhoehen der Laufvariable, so dass beim naechsten Schreibvorgang die naechste Speicherstelle beschrieben wird
+        }
+        divisor = divisor/10;               // Verringern des Divisors um eine Stellenwertigkeit
+    }
+    
+    str[i] = '\0';      // Setzen des Ende des Strings
+    
+    return i;           // Rueckgabe der Variable, die auf das Ende des Strings zeigt
 }

@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c adc_module.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/uart_com.o.d ${OBJECTDIR}/motor_stat.o.d ${OBJECTDIR}/commutation.o.d ${OBJECTDIR}/des_speed.o.d ${OBJECTDIR}/com_interface.o.d ${OBJECTDIR}/scheduler.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o ${OBJECTDIR}/adc_module.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/uart_com.o.d ${OBJECTDIR}/motor_stat.o.d ${OBJECTDIR}/commutation.o.d ${OBJECTDIR}/des_speed.o.d ${OBJECTDIR}/com_interface.o.d ${OBJECTDIR}/scheduler.o.d ${OBJECTDIR}/adc_module.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/uart_com.o ${OBJECTDIR}/motor_stat.o ${OBJECTDIR}/commutation.o ${OBJECTDIR}/des_speed.o ${OBJECTDIR}/com_interface.o ${OBJECTDIR}/scheduler.o ${OBJECTDIR}/adc_module.o
 
 # Source Files
-SOURCEFILES=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c
+SOURCEFILES=main.c uart_com.c motor_stat.c commutation.c des_speed.c com_interface.c scheduler.c adc_module.c
 
 
 
@@ -137,6 +137,12 @@ ${OBJECTDIR}/scheduler.o: scheduler.c  .generated_files/flags/default/8eef918214
 	@${RM} ${OBJECTDIR}/scheduler.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  scheduler.c  -o ${OBJECTDIR}/scheduler.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/scheduler.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
+${OBJECTDIR}/adc_module.o: adc_module.c  .generated_files/flags/default/1bab618a35a36a5cd34e188fb1f3ec9d794948e2 .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/adc_module.o.d 
+	@${RM} ${OBJECTDIR}/adc_module.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  adc_module.c  -o ${OBJECTDIR}/adc_module.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/adc_module.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
 else
 ${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/fedba979e906ad77ef1c6a22b61be7f474ba4202 .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
 	@${MKDIR} "${OBJECTDIR}" 
@@ -179,6 +185,12 @@ ${OBJECTDIR}/scheduler.o: scheduler.c  .generated_files/flags/default/4894a5392a
 	@${RM} ${OBJECTDIR}/scheduler.o.d 
 	@${RM} ${OBJECTDIR}/scheduler.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  scheduler.c  -o ${OBJECTDIR}/scheduler.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/scheduler.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
+	
+${OBJECTDIR}/adc_module.o: adc_module.c  .generated_files/flags/default/1371e971a2098ddb6407066eb4e60b96c5a77427 .generated_files/flags/default/fd67b544a79261c2fe49714d5749bb13d89b49dc
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/adc_module.o.d 
+	@${RM} ${OBJECTDIR}/adc_module.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  adc_module.c  -o ${OBJECTDIR}/adc_module.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MP -MMD -MF "${OBJECTDIR}/adc_module.o.d"        -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"
 	
 endif
 
