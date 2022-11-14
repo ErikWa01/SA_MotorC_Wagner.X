@@ -67,6 +67,7 @@ int main() {
     motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     UART2_Init();       // Initialisierung des UART2-Moduls
     com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
+    scheduler_init();
 //    temp = ADCBUF0;
 
     while (1)
@@ -83,8 +84,8 @@ int main() {
 //                T1CON = 0x0000;
 //            }
 //        }
-        motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
-        calc_I_from_ADval();
+//        motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
+//        calc_I_from_ADval();
     }
     
     return (EXIT_SUCCESS);

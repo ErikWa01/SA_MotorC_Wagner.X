@@ -43,6 +43,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     {
         // Aufruf motor_stat und commutation
         tmr_count_task1 = 0;
+        calc_I_from_ADval();
+        motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
     }
     if(tmr_count_task2 == tmr_trig_task2)
     {
