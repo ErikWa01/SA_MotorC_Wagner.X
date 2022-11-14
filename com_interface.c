@@ -19,6 +19,7 @@ float des_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 void com_interface_init()
 {
     CNEN1 = 0xE0; // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
+    IPC3bits.CNIP = 6;  // Setzen der Interrupt-Prioritaet auf die Hoechste
     IFS0bits.CNIF = 0; // Loeschen moeglicher ausgeloester Interrupts
     IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
     // msg_tx = "";
@@ -29,9 +30,9 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 {
     IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
     
-    msg_tx[0] = read_HallSensors();
-    msg_tx[1] = '\0';
-    send_msg(msg_tx);
+    msg_tx[0] = read_HallSensors();     // Speichern des Hallstatus als 1-Byte grosse Nachricht im Char-Array-Format
+    msg_tx[1] = '\0';                   // Abschlieﬂen des Char-Arrays
+    send_msg(msg_tx);                   // Uebergabe der Nachricht an UART-Kommunikationsmodul
 }
 
 /* Funktion zur Auswertung der ¸ber UART Empfangenen Nachricht */
@@ -51,17 +52,16 @@ void handle_msg_rx(char *msg)
 
         // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gew√ºnschte Geschwindigkeits√§nderung gesendet
         if (des_speed >= 0 && des_speed <= 9) {
-            set_des_speed(des_speed);   // Aktualisierung der Geschwindigkeit
+            set_des_speed(des_speed);   // Aktualisierung der Sollgeschwindigkeit
         }
     }
 }
 
 // Funktion zum Senden des Stromes
-//void send_current(int I)
-//{
-//    msg_tx[0] = (I & 0xFF00) >> 8;
-//    msg_tx[1] = (I & 0x00FF);
-//    msg_tx[2] = '\0';
-//    if(get_send_msg_flag() == 0)
-//        send_msg(msg_tx);
-//}
+void send_current(int I)
+{
+    msg_tx[0] = (I & 0xFF00) >> 8;  // Speichern des oberen Bytes des AD-Hexwertes in zuerst zu sendendem char
+    msg_tx[1] = (I & 0x00FF);       // Speichern des unteren Bytes des AD-Hexwertes in als zweites zu sendendem char
+    msg_tx[2] = '\0';               // Abschlieﬂen des char-Arrays
+    send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
+}

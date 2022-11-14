@@ -34,6 +34,8 @@ void UART2_Init() {
     U2MODEbits.UARTEN = 1;  // UART aktivieren
     U2STAbits.UTXEN = 1;    // UART-Ã?bertragung aktivieren
 
+    IPC6bits.U2TXIP = 6;    // Zweithoechste Prioritaet auf Komm.-Interrupts setzen
+    IPC6bits.U2RXIP = 7;
     IFS1bits.U2TXIF = 0;    // Rücksetzen des Interrupt-Flags für TX
     IFS1bits.U2RXIF = 0;    // Rücksetzen des Interrupt-Flags für RX
     IEC1bits.U2TXIE = 1;    // Aktivieren des TX-Interrupts zum Senden
@@ -50,13 +52,16 @@ void UART2_Init() {
 
 void send_msg(char *msg)
 {
-    msg_uart_tx = msg; // Speichern der zu sendenden Nachricht in einem Char-Field
-    msg_count = 0;  // Setzen der Laufvariable auf ersten Character
-    send_msg_flag = 1;  // Setzen des Flags zum senden der Nachricht
-    U2TXREG = msg_uart_tx[0]; // Senden des ersten Characters der Nachricht
+    if(send_msg_flag == 0)
+    {
+        msg_uart_tx = msg; // Speichern der zu sendenden Nachricht in einem Char-Field
+        msg_count = 0;  // Setzen der Laufvariable auf ersten Character
+        send_msg_flag = 1;  // Setzen des Flags zum senden der Nachricht
+        U2TXREG = msg_uart_tx[0]; // Senden des ersten Characters der Nachricht
+    }
 }
 
-/* Interrupt zum senden des Status der Hall-Sensoren*/
+/* Interrupt zum senden von Nachrichten*/
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt(void) {
     
     IFS1bits.U2TXIF = 0;    // TX-Interrupt-Flag lÃ¶schen
@@ -81,10 +86,4 @@ void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt(void) {
     msg_uart_rx[1] = '\0';       // Definiertes Ende des Arrays
     
     handle_msg_rx(msg_uart_rx);
-}
-
-
-int get_send_msg_flag()
-{
-    return send_msg_flag;
 }

@@ -55,9 +55,10 @@
 #include "global_const.h"
 #include "scheduler.h"
 
+// Variablen fuer Tests und Zeitbestimmung
 //int temp;
-int count = 0;
-int value = 0;
+//int count = 0;
+//int value = 0;
 
 /*
  * 
@@ -67,11 +68,12 @@ int main() {
     motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     UART2_Init();       // Initialisierung des UART2-Moduls
     com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
-    scheduler_init();
+    scheduler_init();       // Initialisierung des Timers fuer zeitgesteuerte Funktionsaufrufe
 //    temp = ADCBUF0;
 
     while (1)
     {
+        // Folgender Code war zur Zeitbestimmung der AD-Wandlung gedacht --> nicht mehr benoetigt
 //        if(temp != ADCBUF0)
 //        {
 //            if(count == 0){

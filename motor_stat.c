@@ -10,13 +10,11 @@
 #include "com_interface.h"
 
 // Variablendeklaration
-int I_motor_ADval = 0;
-double I_motor_double;
-int *AD_Buf_ptr;
-int measure_count = 0;
-int is_wandling;
+int I_motor_ADval;      // Variable zum Speichern des AD-gewandelten Stromproportionalem Wert
+double I_motor_double;      // Variable zum Speichern des umgerechneten tatsaechlichen Stromwertes
+int *AD_Buf_ptr;            // Pointer auf Buffer, in dem ADC-Ausgangswerte gespeichert werden
 
-/* Funktion zur Initialisierung der Hall-Sensoren */
+/* Funktion zur Initialisierung der Hall-Sensoren und des AD-Wandlers */
 void motor_stat_init() {
 
     TRISB = 0x003C;     // Festlegung des Inputs (TRISB2, TRISB3, TRISB4 und TRISB5 sind Inputs)
@@ -30,6 +28,7 @@ void motor_stat_init() {
     ADCON2bits.SMPI = 0x7;  // Ausloesen eines Interrupts nach 8 Sample/Convert Durchlauf
     ADCON1bits.ASAM = 1;    // Auto-Start Sampling
     ADCON1bits.SSRC = 0x7;  // Auto Convert
+    IPC2bits.ADIP = 5;      // Setzen der Interruptprioritaet auf zweitniedrigste
     IFS0bits.ADIF = 0;      // Ruecksetzen des ADC-Interrupt-Flags
     IEC0bits.ADIE = 1;      // Aktivieren der ADC-Interrupts
     ADCON1bits.ADON = 1;    // Aktivierung des ADC
@@ -44,24 +43,21 @@ int read_HallSensors()
 // Interrupt zur Verarbeitung des AD gewandelten Stromwertes
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void)
 {
-    int i;
+    int i;                          // Initialisieren der Laufvariable fuer Schleife
     
     IFS0bits.ADIF = 0;              // Ruecksetzen des Interrupt-Flags
-    is_wandling = 1;
     
-     AD_Buf_ptr = &ADCBUF0;          // Setzen des Buffer-Pointers auf Buffer 0
-     I_motor_ADval = 0;
-//    I_motor = ADCBUF0;
+     AD_Buf_ptr = &ADCBUF0;         // Setzen des Buffer-Pointers auf Buffer 0
+     I_motor_ADval = 0;             // Ruecksetzen des Wertes zum Speichern der Summe der Bufferwerte       
     
     /* Durchlaufen von 8 Buffern und bilden des Mittelwerts */
     for(i = 0; i < 8; i++)
     {
-        I_motor_ADval = I_motor_ADval + *AD_Buf_ptr++;
+        I_motor_ADval = I_motor_ADval + *AD_Buf_ptr++;  // Addieren des Buffers und erhoehen des Bufferpointers
     }
-    I_motor_ADval = I_motor_ADval / 8;
-    is_wandling = 0;
+    I_motor_ADval = I_motor_ADval / 8;                  // Bilden des Mittelwerts aus den addierten Werten
 
-    send_current(I_motor_ADval);          // Senden des gemessenen Stromwertes
+    //send_current(I_motor_ADval);          // Senden des gemessenen Stromwertes zum Auslesen bei Tests (ggf. Auskommentiert)
 }
 
 // Berechnen des Stromes anhand dem Wert des AD-Wandlers
