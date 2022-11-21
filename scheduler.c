@@ -44,6 +44,8 @@ void scheduler_init()
 // Timer Interrupt --> Wird jeweils nach 200 µs aufgerufen
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
 {
+    IFS0bits.T1IF = 0;      // Ruecksetzen des Interruptflags des Timers
+    
     // Erhoehen der Task-Zaehlervariablen mit jedem Timerdurchlauf
     tmr_count_task1++;
     tmr_count_task2++;

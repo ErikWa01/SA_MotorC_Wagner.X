@@ -56,9 +56,9 @@
 #include "scheduler.h"
 
 // Variablen fuer Tests und Zeitbestimmung
-//int temp;
-//int count = 0;
-//int value = 0;
+    //int temp;
+    //int count = 0;
+    //int value = 0;
 
 /*
  * 
@@ -74,7 +74,7 @@ int main() {
 
     while (1)
     {
-        // Folgender Code war zur Zeitbestimmung der AD-Wandlung gedacht --> nicht mehr benoetigt
+//        // Folgender Code war zur Zeitbestimmung der AD-Wandlung gedacht --> nicht mehr benoetigt
 //        if(temp != ADCBUF0)
 //        {
 //            if(count == 0){
@@ -85,10 +85,9 @@ int main() {
 //            {
 //                value = TMR1;
 //                T1CON = 0x0000;
+//                TMR1 = 0;
 //            }
 //        }
-//        motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
-//        calc_I_from_ADval();
     }
     
     return (EXIT_SUCCESS);

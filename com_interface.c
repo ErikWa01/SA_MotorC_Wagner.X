@@ -64,7 +64,7 @@ void send_current()
     int I;
     int string_ende;
     
-    I = get_I_motor_ADval() - 506;  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
+    I = get_I_motor_ADval() - 510;  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
     
     string_ende = itoa(I, msg_tx);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
     msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
