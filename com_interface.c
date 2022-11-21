@@ -19,21 +19,7 @@ float des_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 // Funktion zur Initialisierung der Kommunikationssteuerung
 void com_interface_init()
 {
-    CNEN1 = 0xE0; // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
-    IPC3bits.CNIP = 6;  // Setzen der Interrupt-Prioritaet auf die Hoechste
-    IFS0bits.CNIF = 0; // Loeschen moeglicher ausgeloester Interrupts
-//    IEC0bits.CNIE = 1; // Aktivieren des Input Change Interrupts
     // msg_tx = "";
-}
-
-// Senden der Hall-Sensoren sobald Statusaenderung
-void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
-{
-    IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
-    
-    msg_tx[0] = read_HallSensors();     // Speichern des Hallstatus als 1-Byte grosse Nachricht im Char-Array-Format
-    msg_tx[1] = '\0';                   // Abschließen des Char-Arrays
-    send_msg(msg_tx);                   // Uebergabe der Nachricht an UART-Kommunikationsmodul
 }
 
 /* Funktion zur Auswertung der über UART Empfangenen Nachricht */
