@@ -71,6 +71,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     {
         tmr_count_task3 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf einer Wiederkehrenden Kommunikationsnachricht
-        send_current();
+        // send_current();
+        send_motor_stat();
     }
 }

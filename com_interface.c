@@ -59,6 +59,21 @@ void send_current()
     send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
 }
 
+/* Funktion zum Senden der Winkelgeschwindigkeit und des Drehwinkels */
+void send_motor_stat()
+{
+    int string_ende;
+    
+    string_ende = itoa(get_omega(), msg_tx);
+    msg_tx[string_ende++] = '\n';
+    string_ende = itoa(get_drehwinkel(), &msg_tx[string_ende]);
+    msg_tx[string_ende++] = '\n';
+    msg_tx[string_ende++] = '-';
+    msg_tx[string_ende] = '\0';
+    
+    send_msg(msg_tx);
+}
+
 /* Funktion zum Umwandeln eines signed Integer in einen String
  * 
  * Übergabeparameter:

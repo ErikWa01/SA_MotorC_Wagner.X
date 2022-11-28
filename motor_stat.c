@@ -12,7 +12,7 @@
 
 // Variablendeklaration
 int omega;              // Winkelgeschwindigkeit in x * 0,075 ∞/s
-int drehzahl;           // Drehzhal in x *  U/min
+// int drehzahl;           // Drehzhal in x *  U/min
 unsigned int drehwinkel;    // Drehwinkel in x * 0,0075 ∞
 unsigned int drehwinkel_last_hall;      // Speichert Drehwinkel des letzten hall_sensor_status in x * 0,0075 ∞
 int drehzahl_valid;         // Wenn die Drehzahl gueltig bestimmt werden kann 1, sonst 0
@@ -22,12 +22,14 @@ int new_hall_value;     // In Kommutierungsreihenfolge gewandelter Hallsensorsta
 int hall_allocation_array[6];   // Array, welches den entsprechenden Hallsensorstatus die Zahlen 0 bis 5 in Kommutierungsreihenfolge zuweist
 int hall_difference;          // Differenz zwischen den Werten des alten gewandelten Hallsensorstatus und des neuen
 unsigned long timer_val;      // Variable zum Auslesen der aktuellen Timer Zaehlvariable
+unsigned long temp;           // Variable zum Voruebergehenden Speichern des MSW der Timer Zaehlvariable
 unsigned long timer_endval;   // Variable zum Setzen des neuen Endwerts des Timers entsprechend der Winkelgeschwindigkeit
 unsigned int drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeicher hat
 
 
 /* Funktion zur Initialisierung der Hall-Sensoren und des AD-Wandlers */
 void motor_stat_init() {
+    int i;  // Laufvariable for-Schleife
     
     // Hallsensoren
     TRISB |= 0x38;      // Festlegung des Inputs (TRISB2, TRISB3, TRISB4 sind Inputs)
@@ -45,7 +47,7 @@ void motor_stat_init() {
     
     // Variablen auf Standardwerte setzen
     omega = 0;
-    drehzahl = 0;
+    //drehzahl = 0;
     drehwinkel = 0;
     drehzahl_valid = 0;
     first_call = 1;
@@ -73,6 +75,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 {
     IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
     
+    // Pruefen ob dies der erste Aufuruf des Interrupts, nachdem Drehzahl_valid = 0 gesetzt wurde
     if(first_call)
     {
         TMR3HLD = 0x0000;   // Zuruecksetzen der Zaehlvariable  (MSW)
@@ -88,8 +91,9 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         
         first_call = 0;     // Interrupt wurde einmal aufgerufen
     }else{
-        timer_val = TMR2;       // Auslesend der vergangenen Zeit LSW
-        timer_val += (TMR3HLD << 16);    // MSW
+        timer_val = TMR2;       // Auslesen der vergangenen Zeit LSW
+        temp = TMR3HLD;         // MSW Speichern
+        timer_val += (temp << 16);    // Gesamtwert berechnen
         TMR3HLD = 0x0000;   // Zuruecksetzen der Zaehlvariable  (MSW)
         TMR2 = 0x0000;      // des Timers                       (LSW)
         
@@ -117,7 +121,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
             drehwinkel = drehwinkel_last_hall + hall_difference * 400;      // Drehwinkel ist der des letzten Hallsensorstatus + Differenz der Hallsensorstatus * Winkel zwischen zwei Hallsensorstatus
         }
         
-        drehzahl_valid = 1;         // Drehzahl wurde gueltig bestimmt
+        drehzahl_valid = 1;                     // Drehzahl wurde gueltig bestimmt
         drehwinkel_last_hall = drehwinkel;      // Speichern des zuletzt geschriebenen Drehwinkels
         
         // Neuer Endwert des Timers --> Ueberlauf des Timers soll verhindern, dass durch Programm bestimmte Drehzahl der tatsaechlichen weit voraus ist und somit Kommutierung falsch laeuft
@@ -129,10 +133,10 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 }
 
 /* Funktion, zur Drehwinkelbestimmung anhand der aktuellen Winkelgeschwindigkeit
- * muss alle 200 µs aufgerufen werden */
+ * muss alle 600 µs aufgerufen werden */
 void calc_motor_position()
 {
-    drehwinkel += (omega*2000)/1000000;     // drehwinkel += omega * 0,075/0,0075 * 200 * 10^-6 = omega * 10 * 200/10^6 = omega * 2000/1000000
+    drehwinkel += (omega*6000)/1000000;     // drehwinkel += omega * 0,075/0,0075 * 600 * 10^-6 = omega * 10 * 600/10^6 = omega * 6000/1000000
     
     // Wenn Zahl hoeher als 360∞ (entspricht 48000)
     if(drehwinkel >= 48000)
@@ -140,15 +144,35 @@ void calc_motor_position()
         if(drehwinkel > 60000)  // Annahme: Wenn Zahl ueber 60000 hohe Zahl durch negativen Ueberlauf entstanden
         {
             // Bei negativem Ueberlauf ist Zahl: negativer Drehwinkel + hoechste Darstellbare Zahl + 1 = negativer Drehwinkel + 65536
-            drehwinkel = 48000 - (65536 - drehwinkel);  // Rueckrechnung: Winkel eigentlich 360∞ minus Betrag des negativem Drehwinkels
+            drehwinkel = 48000 - (65536 - drehwinkel);  // Rueckrechnung: Winkel eigentlich 360∞ minus Betrag des negativen Drehwinkels
         }else{
             drehwinkel -= 48000;  // Wenn Zahl unter 60000, aber ueber 48000 ist Winkel ueber 360∞ --> 360∞ ist neue 0∞
         }
     }
 }
 
+/* Funktion wird ausgeloest wenn Timer ueberlaeuft --> Erkennung eines Stillstands des Motors */
+void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void)
+{
+    IFS0bits.T3IF = 0;  // Ruecksetzen Interrupt-Flag
+    
+    omega = 0;          // Winkelgeschwindigkeit = 0
+    drehzahl_valid = 0; // Drehzahl ab jetzt wieder ungueltig bis neu bestimmt wurde
+    first_call = 1;     // Bei Hallsensorinterrupt muss jetzt zu naechst die erste Routine wieder durchgefuehrt werden
+}
+
 /* Funktion, um den Status der Hall-Sensoren auszulesen */
 int read_HallSensors()
 {
     return (PORTB & 0x0038) >> 3;    // Lesen der Zust√§nde der Hall-Sensoren und direktes Verschieben der Bits um drei nach rechts
+}
+
+int get_omega()
+{
+    return omega;
+}
+
+int get_drehwinkel()
+{
+    return drehwinkel;
 }

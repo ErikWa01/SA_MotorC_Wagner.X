@@ -54,6 +54,7 @@
 #include "com_interface.h"
 #include "global_const.h"
 #include "scheduler.h"
+#include "adc_module.h"
 
 // Variablen fuer Tests und Zeitbestimmung
     //int temp;

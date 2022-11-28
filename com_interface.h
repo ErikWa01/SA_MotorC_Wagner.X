@@ -16,6 +16,7 @@ extern "C" {
     void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void);
     void handle_msg_rx(char *msg);
     void send_current();
+    void send_motor_stat();
     int itoa(int value, char *str);
 
 
