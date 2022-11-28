@@ -20,7 +20,7 @@ uint16_t Predefiner = ((FCY / BAUD) / 16) - 1; // Einstellen der Baudrate
 int msg_count = 0;          // Laufvariable zum Durchlaufen der Char-Arrays der zu sendenden Nachrichten
 char *msg_uart_tx;               // Pointer auf Anfang des Char-Arrays einer zu sendenen Nachricht
 int send_msg_flag;      // Flag zum erkennen ob Nachricht gesendet werden soll oder nicht
-char msg_uart_rx[];               // Pointer auf Anfang des Char-Arrays einer empfangenen Nachricht
+char msg_uart_rx[100];               // Pointer auf Anfang des Char-Arrays einer empfangenen Nachricht
 
 
 /* Funktion zur Initialisierung der UART-Kommunikation */

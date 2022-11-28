@@ -16,7 +16,7 @@ void motor_stat_init();
 void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void);
 void calc_motor_position();
 void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void);
-int get_omega();
+int get_drehzahl();
 int get_drehwinkel();
 int read_HallSensors();
 

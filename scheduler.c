@@ -34,9 +34,10 @@ void scheduler_init()
     
     tmr_count_task1 = 0;    // Initialisieren der Variable auf 0
     tmr_count_task2 = 0;    // Initialisieren der Variable auf 0
-    tmr_trig_task1 = 3;     // Aufruf des Task 1 nach 3 Timerdurchläufen
-    tmr_trig_task2 = 50;    // Aufruf des Task 2 nach 50 Timerdurchläufen
-    tmr_trig_task3 = 5000;
+    tmr_count_task3 = 0;    // Initialisieren der Variable auf 0
+    tmr_trig_task1 = 1;     // Aufruf des Task 1 nach 1 Timerdurchlauf
+    tmr_trig_task2 = 50;    // Aufruf des Task 2 nach 50 Timerdurchlaeufen
+    tmr_trig_task3 = 5000;  // Aufruf des Task 3 nach 5000 Timerdurchlaeufen
     
     T1CONbits.TON = 1;      // Starten des Timers
 }
@@ -56,6 +57,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     {
         tmr_count_task1 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf motor_stat und commutation
+        calc_motor_position();
         motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
     }
     
@@ -73,5 +75,6 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         // Aufruf einer Wiederkehrenden Kommunikationsnachricht
         // send_current();
         send_motor_stat();
+//        send_drehwinkel();
     }
 }

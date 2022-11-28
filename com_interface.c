@@ -12,9 +12,10 @@
 #include "adc_module.h"
 
 // Variablendeklaration
-char msg_tx[]; // Pointer für char-Arrays, zum Speichern der zusendenden Nachrichten
+char msg_tx[100]; // Pointer für char-Arrays, zum Speichern der zusendenden Nachrichten
 char *msg_rx; // Pointer für char-Arrays, zum Speichern einer empfangenen Nachricht
 float des_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
+int string_ende;        // Variable zum Speichern der Laufvariable, die auf das Ende des msg-Strings zeigt
 
 // Funktion zur Initialisierung der Kommunikationssteuerung
 void com_interface_init()
@@ -52,7 +53,7 @@ void send_current()
     
     I = get_I_motor_ADval() - 510;  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
     
-    string_ende = itoa(I, msg_tx);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
+    string_ende = itoa(I, msg_tx, 1);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
     msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
     msg_tx[string_ende] = '\0';     // Setzen des Ende des Strings
     
@@ -62,50 +63,78 @@ void send_current()
 /* Funktion zum Senden der Winkelgeschwindigkeit und des Drehwinkels */
 void send_motor_stat()
 {
-    int string_ende;
+    int tmp_ende;           // Variable zum Speichern der Laufvariable, die auf das Ende des tmp-Strings zeigt
+    char tmp[50];           // tmp-String --> Zusaetzlicher String zum Speichern der Drehzahl
+    int i;                  // Laufvariable for-Schleife
+
+    string_ende = itoa(get_drehzahl(), msg_tx, 1); // Speichere Winkelgeschwindigkeit in msg_tx
+    msg_tx[string_ende++] = '\n';               // Zeilenumbruch
+    tmp_ende = itoa(get_I_motor_ADval() - 510, tmp, 1);  // Speichere Drehzahl in einem zusaetzlichem String
     
-    string_ende = itoa(get_omega(), msg_tx);
-    msg_tx[string_ende++] = '\n';
-    string_ende = itoa(get_drehwinkel(), &msg_tx[string_ende]);
-    msg_tx[string_ende++] = '\n';
-    msg_tx[string_ende++] = '-';
-    msg_tx[string_ende] = '\0';
+    // Fuege zusaetzlichen String zu msg_tx hinzu
+    for(i = 0; i < tmp_ende; i++)   
+    {
+        msg_tx[string_ende++] = tmp[i];
+    }
+    
+    msg_tx[string_ende++] = '\n';   // Zeilenumbruch
+    msg_tx[string_ende++] = '-';    // Markierung, visuelles Nachrichtende
+    msg_tx[string_ende++] = '\n';   // Zeilenumbruch
+    msg_tx[string_ende] = '\0';     // Technisches Nachrichtende
     
     send_msg(msg_tx);
 }
 
-/* Funktion zum Umwandeln eines signed Integer in einen String
+// Funktion zum Senden des Stromes
+void send_drehwinkel()
+{
+    string_ende = itoa(get_drehwinkel(), msg_tx, 0);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
+    msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
+    msg_tx[string_ende] = '\0';     // Setzen des Ende des Strings
+    
+    send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
+}
+
+/* Funktion zum Umwandeln eines signed oder unsigned Integer in einen String
  * 
  * Übergabeparameter:
  *  - value: der zu wandelnde Integerwert
  *  - str: pointer auf die Speicheradresse, die erstes Byte des Strings enthalten soll
+ *  - is_signed: 1, wenn der Integerwert signed ist, sonst 0
  * 
  * Rückgabeparameter:
  *  - Integerwert, der auf die letzte Speicheradresse des Strings zeigt
  */
-int itoa(int value, char *str)
+int itoa(int value, char *str, int is_signed)
 {
     int i = 0;              // Laufvariable
     int divisor = 10000;    // Durch diesen Wert wird der Int-Wert geteilt
     int printed = 0;        // Erkennung, ob bereits eine Ziffer gespeichert wurde
+    unsigned int u_value;
     
-    // Pruefen, ob die Zahl negativ ist
-    if(value < 0)
+    // Pruefen, ob Zahl signed ist
+    if(is_signed)
     {
-        str[i] = '-';       // Ist die Zahl negativ wird ein Minus gespeichert
-        value = -value;     // und der Betrag der Zahl fuer die weitere Verarbeitung gebildet
-        i++;
+        // Pruefen, ob die Zahl negativ ist
+        if(value < 0)
+        {
+            str[i] = '-';       // Ist die Zahl negativ wird ein Minus gespeichert
+            value = -value;     // und der Betrag der Zahl fuer die weitere Verarbeitung gebildet
+            i++;
+        }
     }
+    
+    u_value = value;
     
     // Solange Divisor mindestens 1 ist, sind noch Ziffern zu speichern
     while(divisor > 0)
     {
-        // Gespeichert wird eine Ziffer nur, wenn die an der Stelle mit der Wertigkeit des Divisors eine Ziffer > 0 ist,
+        // Gespeichert wird eine Ziffer nur, wenn an der Stelle mit der Wertigkeit des Divisors eine Ziffer > 0 ist,
         // bereits eine Ziffer gespeichert wurde oder der Divisor 1 ist (Dann ist die Zahl 0)
-        if(value/divisor || printed || divisor == 1)
+        if(u_value/divisor || printed || divisor == 1)
         {
-            str[i] = value/divisor + '0';   // Extrahieren der Stelle mit der Wertigkeit des Divisors und umwandeln in ASCII-Code
-            value = value % divisor;        // Bilden des noch zu wandelnden Wertes durch Modulo-Operation 
+            str[i] = u_value/divisor + '0';   // Extrahieren der Stelle mit der Wertigkeit des Divisors und umwandeln in ASCII-Code
+            u_value = u_value % divisor;        // Bilden des noch zu wandelnden Wertes durch Modulo-Operation 
             printed = 1;                    // Erkennung, dass bereits eine Ziffer gespeichert wurde
             i++;                            // Erhoehen der Laufvariable, so dass beim naechsten Schreibvorgang die naechste Speicherstelle beschrieben wird
         }

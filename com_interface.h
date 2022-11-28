@@ -17,7 +17,8 @@ extern "C" {
     void handle_msg_rx(char *msg);
     void send_current();
     void send_motor_stat();
-    int itoa(int value, char *str);
+    void send_drehwinkel();
+    int itoa(int value, char *str, int is_signed);
 
 
 #ifdef	__cplusplus
