@@ -10,7 +10,7 @@
 #include "global_const.h"
 
 /* Definition von Konstanten */
-#define FPWM 39000          // Definition der Frequenz (PWM) 
+#define FPWM 20000          // Definition der Frequenz (PWM) 
 #define DUTY (FCY/FPWM -1)  // Definition des Duty-Cycle (Tastgrad) der PWM
 
 float  startspeed = 1;

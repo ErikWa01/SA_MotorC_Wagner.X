@@ -67,9 +67,9 @@ void send_motor_stat()
     char tmp[50];           // tmp-String --> Zusaetzlicher String zum Speichern der Drehzahl
     int i;                  // Laufvariable for-Schleife
 
-    string_ende = itoa(get_drehzahl(), msg_tx, 1); // Speichere Winkelgeschwindigkeit in msg_tx
-    msg_tx[string_ende++] = '\n';               // Zeilenumbruch
-    tmp_ende = itoa(get_I_motor_ADval() - 510, tmp, 1);  // Speichere Drehzahl in einem zusaetzlichem String
+    string_ende = itoa(get_drehzahl(), msg_tx, 1); // Speichere Drehzahl in msg_tx
+    msg_tx[string_ende++] = '\n';                   // Zeilenumbruch
+    tmp_ende = itoa(get_I_motor_ADval() - 510, tmp, 1);  // Speichere Motorstrom in einem zusaetzlichem String
     
     // Fuege zusaetzlichen String zu msg_tx hinzu
     for(i = 0; i < tmp_ende; i++)   
