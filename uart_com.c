@@ -34,8 +34,8 @@ void UART2_Init() {
     U2MODEbits.UARTEN = 1;  // UART aktivieren
     U2STAbits.UTXEN = 1;    // UART-Ã?bertragung aktivieren
 
-    IPC6bits.U2TXIP = 6;    // Zweithoechste Prioritaet auf Komm.-Interrupts setzen
-    IPC6bits.U2RXIP = 6;
+    IPC6bits.U2TXIP = 5;    // Interrupt-Prioritaet der Komm.-Interrupts
+    IPC6bits.U2RXIP = 5;    // niedriger als Timer und Hallsensoren setzen
     IFS1bits.U2TXIF = 0;    // Rücksetzen des Interrupt-Flags für TX
     IFS1bits.U2RXIF = 0;    // Rücksetzen des Interrupt-Flags für RX
     IEC1bits.U2TXIE = 1;    // Aktivieren des TX-Interrupts zum Senden

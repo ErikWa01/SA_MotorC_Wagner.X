@@ -66,10 +66,10 @@
  */
 int main() {
     PWM_Init();         // Initialisierung der PWM
-    motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     UART2_Init();       // Initialisierung des UART2-Moduls
     com_interface_init(); // Initialisierung der Kommunikationsschnittstelle
     adc_init();             // Initialisierung des AD-Wandler-Moduls
+    motor_stat_init();  // Initialisierung der Hall-Sensoren und der Strommessung
     scheduler_init();       // Initialisierung des Timers fuer zeitgesteuerte Funktionsaufrufe
 //    temp = ADCBUF0;
 

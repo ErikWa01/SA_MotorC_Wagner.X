@@ -14,7 +14,7 @@
 // Variablendeklaration
 char msg_tx[100]; // Pointer f�r char-Arrays, zum Speichern der zusendenden Nachrichten
 char *msg_rx; // Pointer f�r char-Arrays, zum Speichern einer empfangenen Nachricht
-float des_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
+float msg_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 int string_ende;        // Variable zum Speichern der Laufvariable, die auf das Ende des msg-Strings zeigt
 
 // Funktion zur Initialisierung der Kommunikationssteuerung
@@ -36,11 +36,11 @@ void handle_msg_rx(char *msg)
     // Falls 'msg_rx[0]' keine der beiden Buchstaben 'v' oder 'r' enthält, könnte Befehl eine Geschwindigkeitsänderung sein... 
     else {
         // Umwandlung von char 'msg_rx[0]' in eine float-Variable 'msg_rx[0]'
-        des_speed = msg_rx[0] - 48;
+        msg_speed = msg_rx[0] - 48;
 
         // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gewünschte Geschwindigkeitsänderung gesendet
-        if (des_speed >= 0 && des_speed <= 9) {
-            set_des_speed(des_speed);   // Aktualisierung der Sollgeschwindigkeit
+        if (msg_speed >= 0 && msg_speed <= 9) {
+            set_des_speed(msg_speed);   // Aktualisierung der Sollgeschwindigkeit
         }
     }
 }

@@ -19,6 +19,7 @@ void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void);
 int get_drehzahl();
 int get_drehwinkel();
 int read_HallSensors();
+int drehwinkel_is_valid();
 
 
 #ifdef	__cplusplus

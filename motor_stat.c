@@ -16,7 +16,7 @@ unsigned int drehwinkel;    // elektrischer Drehwinkel in x * 0,0075 °
 unsigned int last_drehwinkel;   // Speichern des zuletzt geschriebenen Drehwinkels
 long drehwinkel_difference;     // Speichern der Differenz des Drehwinkels (int ist zu klein fuer +-40000)
 int direction;                  // 0 fuer vorwaerts, 1 fuer rueckwaerts
-int drehzahl_valid;         // Wenn die Drehzahl gueltig bestimmt werden kann 1, sonst 0
+int drehwinkel_valid;         // Wenn der Drehwinkel gueltig bestimmt werden kann 1, sonst 0
 int first_call;         // Wenn Hallsensoren Interrupt nach ungueltiger Drehzahl noch nicht aufgerufen wurde 1, sonst 0
 unsigned long timer_val;      // Variable zum Auslesen der aktuellen Timer Zaehlvariable
 unsigned long timer_val_array[6];   // Array fuer Tiefpass
@@ -40,15 +40,20 @@ void motor_stat_init() {
     T2CONbits.T32 = 1;  // Timer 2/3 kombiniert im 32-Bit-Modus
     PR2 = 0xFFFF;       // LSW des Timerendwerts
     PR3 = 0xFFFF;       // MSW des Timerendwerts --> Gesamtwert 0xFFFF FFFF (Maximalwert)
+    IPC1bits.T3IP = 6;  // Timer Interrupt-Prioritaet niedriger als Scheduler, aber hoeher als Kommunikation und AD-Wandlung
     IFS0bits.T3IF = 0;  // Ruecksetzen des Interruptflags
     IEC0bits.T3IE = 1;  // Aktivieren des Interrupts durch den Timer
+    
+//    // Bestimmung des Drehwinkels zu Beginn aus aktuellem Hallsensorstatus
+//    drehwinkel = drehwinkel_array[read_HallSensors() - 1];      // Bestimmung nur ungefaehr --> Reicht um Motor anfahren zu lassen
     
     // Variablen auf Standardwerte setzen
     drehzahl = 0;
     drehwinkel = 0;
-    drehzahl_valid = 0;
+    drehwinkel_valid = 0;
     first_call = 1;
     val_count = 0;
+    time_hall_change = 0xFFFFFFFF;
     
     // drehwinkel_array fuellen
     drehwinkel_array[0] = 40000;       // Hallstatus 1: In Kommutierungsreihenfolge Platz 5 --> 300°
@@ -79,6 +84,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         PR2 = 0x3E00;       // des Timers auf 300 ms            (LSW)
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];          // Zuweisung des entsprechenden Drehwinkels zum Start der Drehbewegung
+        last_drehwinkel = drehwinkel;                                   // Speichern des alten Drehwinkelwertes
         
         first_call = 0;     // Interrupt wurde einmal aufgerufen
     }else{
@@ -93,6 +99,8 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         if(val_count < 6)                           // val_count ist entweder Anzahl der geschriebenen Werte oder maximal 6
         {
             val_count++;                            // Ein weiterer Wert wurde geschrieben
+        }else{
+            drehwinkel_valid = 1;                   // Erst wenn 6 Werte geschrieben wurden --> Also 1 Kommutierugszyklus durchlaufen ist kann Drehwinkel als gueltig bestimmt angesehen werden
         }
         time_hall_change = 0;                       // Ruecksetzen des Ausgangs des Tiefpass
         for(i = 0; i < val_count; i++)
@@ -106,7 +114,6 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         }
         //Ende Tiefpass
         
-        last_drehwinkel = drehwinkel;                                  // Speichern des alten Drehwinkelwertes
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];         // Bestimmung des aktuellen elektrischen Drehwinkels anhand Hallstatus
         drehwinkel_difference = drehwinkel - last_drehwinkel;          // Bestimmung der Differenz aus aktuellem und neuem
         
@@ -128,11 +135,16 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
             }
         }
         
-        drehzahl_valid = 1;                     // Drehzahl wurde gueltig bestimmt
+//        drehwinkel_valid = 1;                     // Drehwinkel wurde gueltig bestimmt
+        last_drehwinkel = drehwinkel;             // Speichern des aktuellen Drehwinkels als alten Drehwinkelwert
         
-        // Neuer Endwert des Timers --> Ueberlauf des Timers soll verhindern, dass durch Programm bestimmte Drehzahl der tatsaechlichen weit voraus ist und somit Kommutierung falsch laeuft
+        // Neuer Endwert des Timers --> Ueberlauf des Timers soll verhindern, dass durch Programm bestimmter Drehwinkel dem tatsaechlichen weit voraus ist und somit Kommutierung falsch laeuft
         // Außerdem somit Erkennung, wenn Drehzahl 0 wird
-        timer_endval = 2 * timer_val;             // Neuer Endwert des Timers wird so gesetzt, dass Timer in Ueberlauf kommt, wenn 2 mal die Zeit fuer einen Hallsensorstatuswechsel durchlaufen ist
+        timer_endval = 2 * time_hall_change;             // Neuer Endwert des Timers wird so gesetzt, dass Timer in Ueberlauf kommt, wenn 2 mal die Zeit fuer einen Hallsensorstatuswechsel durchlaufen ist
+        if(timer_endval > 1600000)
+        {
+            timer_endval = 1600000;
+        }
         PR3 = (timer_endval & 0xFFFF0000) >> 16;    // Neuer Endwert in entsprechendes
         PR2 = timer_endval & 0x0000FFFF;            // Register des Timers
     }
@@ -168,8 +180,9 @@ void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void)
     IFS0bits.T3IF = 0;  // Ruecksetzen Interrupt-Flag
     
     time_hall_change = 0xFFFFFFFF;      // time_hall_change auf Maximalwert setzen --> Drehzahl = 0, Dauer bis der naechste Hallstatus sich aender "unendlich"
-    drehzahl_valid = 0; // Drehzahl ab jetzt wieder ungueltig bis neu bestimmt wurde
+    drehwinkel_valid = 0; // Drehwinkel ab jetzt wieder ungueltig bis neu bestimmt wurde
     first_call = 1;     // Bei Hallsensorinterrupt muss jetzt zu naechst die erste Routine wieder durchgefuehrt werden
+    val_count = 0;
 }
 
 /* Funktion, um den Status der Hall-Sensoren auszulesen */
@@ -192,4 +205,9 @@ int get_drehzahl()
 int get_drehwinkel()
 {
     return drehwinkel;
+}
+
+int drehwinkel_is_valid()
+{
+    return drehwinkel_valid;
 }

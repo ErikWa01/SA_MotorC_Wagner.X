@@ -28,7 +28,7 @@ int tmr_trig_task3;
 void scheduler_init()
 {
     PR1 = 0xC80;            // Aufruf des Timerinterrupts jeweils nach 200 µs (3200 * Tcy)
-    IPC0bits.T1IP = 4;      // Setzen der Interruptprioritaet auf niedrigste --> Sonst keine Funktionsweise der Kommunikation/AD-Wandlung etc.
+    IPC0bits.T1IP = 7;      // Setzen der Interruptprioritaet auf hoechste --> Zeitdeterministik gewaehrleistet
     IFS0bits.T1IF = 0;      // Ruecksetzen des Interruptflags des Timers
     IEC0bits.T1IE = 1;      // Aktivieren des Timer-Interrupts
     
@@ -58,7 +58,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         tmr_count_task1 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf motor_stat und commutation
         calc_motor_position();
-        motor_commutation(getDesRichtung(), getDesSpeed(), read_HallSensors());
+        motor_commutation();
     }
     
     // Aufrufen des ersten Task, wenn Zaehlervariable Endwert erreicht hat

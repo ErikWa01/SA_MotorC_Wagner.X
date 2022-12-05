@@ -29,7 +29,7 @@ void adc_init() {
     ADCON2bits.SMPI = 0x7;  // Ausloesen eines Interrupts nach 8 Sample/Convert Durchlaeufen
     ADCON1bits.ASAM = 1;    // Auto-Start Sampling
     ADCON1bits.SSRC = 0x7;  // Auto Convert
-    IPC2bits.ADIP = 5;      // Setzen der Interruptprioritaet auf zweitniedrigste
+    IPC2bits.ADIP = 5;      // Setzen der Interruptprioritaet niedriger als Timer und Hallsensoren
     IFS0bits.ADIF = 0;      // Ruecksetzen des ADC-Interrupt-Flags
     IEC0bits.ADIE = 1;      // Aktivieren der ADC-Interrupts
     ADCON1bits.ADON = 1;    // Aktivierung des ADC

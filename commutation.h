@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
     void PWM_Init();
-    void motor_commutation(char richtung, int speed, int Hall_Status);
+    void motor_commutation();
 
 
 #ifdef	__cplusplus

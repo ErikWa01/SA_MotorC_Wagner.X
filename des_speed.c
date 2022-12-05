@@ -11,34 +11,34 @@
 
 
 /* Deklaration von Variablen */
-float speed = 1;            // Geschwindigkeit der Rotation
-char richtung = 'v';              // Richtung der Rotation
+float des_speed = 1;            // Geschwindigkeit der Rotation
+char des_richtung = 'v';              // Richtung der Rotation
 
 // Funktion zum setzen einer neuen Drehrichtung
 void set_des_dir(char desRtg)
 {
-    if (desRtg != richtung)
+    if (desRtg != des_richtung)
     {
         //Kurzeitiges Verlangsamen des Motors
-        speed = 1;
+        des_speed = 1;
         // Aktualisierung der Richtung
-        richtung = desRtg;
+        des_richtung = desRtg;
     }
 }
 
 // Funktion zum setzen einer neuen Geschwindigkeit
-void set_des_speed(float des_speed)
+void set_des_speed(float des_spd)
 {
-    speed = des_speed;
+    des_speed = des_spd;
 }
 
 
 char getDesRichtung()
 {
-    return richtung;
+    return des_richtung;
 }
 
 float getDesSpeed()
 {
-    return speed;
+    return des_speed;
 }
