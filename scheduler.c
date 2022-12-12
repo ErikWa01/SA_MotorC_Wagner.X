@@ -73,8 +73,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     {
         tmr_count_task3 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf einer Wiederkehrenden Kommunikationsnachricht
-        // send_current();
-        send_motor_stat();
-//        send_drehwinkel();
+//        send_current();      // Motorstrom ueber UART senden
+        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
+//        send_drehwinkel();    // Drehwinkel ueber UART senden
     }
 }

@@ -51,7 +51,7 @@ void send_current()
     int I;
     int string_ende;
     
-    I = get_I_motor_ADval() - 510;  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
+    I = get_I_motor_ADval();  // Abfragen des ADC-Stromwertes und Bilden von negativen und positiven Stromwerten mit dem 0-Punkt 503
     
     string_ende = itoa(I, msg_tx, 1);  // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
     msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
@@ -60,7 +60,7 @@ void send_current()
     send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
 }
 
-/* Funktion zum Senden der Winkelgeschwindigkeit und des Drehwinkels */
+/* Funktion zum Senden der Drehzahl und des Motorstroms */
 void send_motor_stat()
 {
     int tmp_ende;           // Variable zum Speichern der Laufvariable, die auf das Ende des tmp-Strings zeigt
@@ -69,7 +69,7 @@ void send_motor_stat()
 
     string_ende = itoa(get_drehzahl(), msg_tx, 1); // Speichere Drehzahl in msg_tx
     msg_tx[string_ende++] = '\n';                   // Zeilenumbruch
-    tmp_ende = itoa(get_I_motor_ADval() - 510, tmp, 1);  // Speichere Motorstrom in einem zusaetzlichem String
+    tmp_ende = itoa(get_I_motor_ADval(), tmp, 1);  // Speichere Motorstrom in einem zusaetzlichem String
     
     // Fuege zusaetzlichen String zu msg_tx hinzu
     for(i = 0; i < tmp_ende; i++)   

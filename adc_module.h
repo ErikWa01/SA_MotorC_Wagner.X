@@ -16,6 +16,7 @@ extern "C" {
     void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void);
     //double calc_I_from_ADval();
     int get_I_motor_ADval();
+    int tiefpass_adc(int x);
 
 
 #ifdef	__cplusplus

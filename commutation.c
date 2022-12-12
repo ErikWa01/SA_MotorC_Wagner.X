@@ -13,13 +13,13 @@
 
 /* Definition von Konstanten */
 #define FPWM 20000          // Definition der Frequenz (PWM) 
-#define DUTY (FCY/FPWM - 1)  // Definition des Duty-Cycle (Tastgrad) der PWM
-#define VKOMW 0              // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
+#define DUTY 2*(FCY/FPWM - 1)  // Definition des Duty-Cycle (Tastgrad) der PWM
+#define VKOMW 2667              // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
 
 char richtung;
 float speed;
 unsigned int el_drehwinkel;
-float startspeed = 0.1;
+float startspeed = 0;
 
 /* Funktion zur Initialisierung des PWM-Signals */
 void PWM_Init() {
@@ -29,6 +29,10 @@ void PWM_Init() {
 
     PWMCON1 = 0x00FF;   // KomplementÃ¤r-Betriebsmodus fÃ¼r alle PWM-KanÃ¤le - Zwei PWM-KanÃ¤le werden einem Tastgrad-Generator zugeordnet
     PTCON = 0;          // Timer-Skalierungen - deaktiviert
+    
+    // Dead-Time konfigurieren
+    DTCON1bits.DTAPS = 0;   // Timerperiodendauer ist TCY
+    DTCON1bits.DTA = 0xA;   // Dead Time ist 10 * TCY = 625 ns
 
     PTPER = FCY / FPWM - 1;     // Einstellen der Periodendauer der PWM
     
@@ -85,46 +89,46 @@ void motor_commutation()
         }
         else if(richtung == 114)    // Richtung ist rueckwaerts   
         {
-//            el_drehwinkel -= VKOMW;     // Bestimmung des el_drehwinkels unter Berücksichtigung der Vorkommutierung
-//
-//            // Kommutierung anhand des elektrischen Drehwinkels
-//            if(el_drehwinkel > 0 && el_drehwinkel <= 8000)              // Drehwinkel zwischen 0° und 60°
-//            {
-//                OVDCON = 0x2001; 
-//            }else if(el_drehwinkel > 8000 && el_drehwinkel <= 16000)    // Drehwinkel zwischen 60° und 120°
-//            {
-//                OVDCON = 0x2004; 
-//            }else if(el_drehwinkel > 16000 && el_drehwinkel <= 24000)   // Drehwinkel zwischen 120° und 180°
-//            {
-//                OVDCON = 0x0204;
-//            }else if(el_drehwinkel > 24000 && el_drehwinkel <= 32000)   // Drehwinkel zwischen 180° und 240°
-//            {
-//                OVDCON = 0x0210;
-//            }else if(el_drehwinkel > 32000 && el_drehwinkel <= 40000)   // Drehwinkel zwischen 240° und 300°
-//            {
-//                OVDCON = 0x0810;
-//            }else if(el_drehwinkel > 40000 && el_drehwinkel <= 48000)   // Drehwinkel zwischen 300° und 360°
-//            {
-//                OVDCON = 0x0801;
-//            }else{
-//                OVDCON = 0x0000;        // Fehler, Drehwinkel außerhalb Wertebereich --> Keine Ansteuerung
-//            }
-            switch (read_HallSensors()) {
-                case 6: OVDCON = 0x0210;
-                    break;
-                case 5: OVDCON = 0x0801;
-                    break;
-                case 4: OVDCON = 0x0810;
-                    break;
-                case 3: OVDCON = 0x2004;
-                    break;
-                case 2: OVDCON = 0x0204;
-                    break;
-                case 1: OVDCON = 0x2001;
-                    break;
-                default: OVDCON = 0x0000;
-                    break;
+            el_drehwinkel -= VKOMW;     // Bestimmung des el_drehwinkels unter Berücksichtigung der Vorkommutierung
+
+            // Kommutierung anhand des elektrischen Drehwinkels
+            if(el_drehwinkel > 0 && el_drehwinkel <= 8000)              // Drehwinkel zwischen 0° und 60°
+            {
+                OVDCON = 0x0810;        // Entspricht Hallsensorstatus 4
+            }else if(el_drehwinkel > 8000 && el_drehwinkel <= 16000)    // Drehwinkel zwischen 60° und 120°
+            {
+                OVDCON = 0x0210;        // Entspricht Hallsensorstatus 6
+            }else if(el_drehwinkel > 16000 && el_drehwinkel <= 24000)   // Drehwinkel zwischen 120° und 180°
+            {
+                OVDCON = 0x0204;        // Entspricht Hallsensorstatus 2
+            }else if(el_drehwinkel > 24000 && el_drehwinkel <= 32000)   // Drehwinkel zwischen 180° und 240°
+            {
+                OVDCON = 0x2004;        // Entspricht Hallsensorstatus 3
+            }else if(el_drehwinkel > 32000 && el_drehwinkel <= 40000)   // Drehwinkel zwischen 240° und 300°
+            {
+                OVDCON = 0x2001;        // Entspricht Hallsensorstatus 1
+            }else if(el_drehwinkel > 40000 && el_drehwinkel <= 48000)   // Drehwinkel zwischen 300° und 360°
+            {
+                OVDCON = 0x0801;        // Entspricht Hallsensorstatus 5
+            }else{
+                OVDCON = 0x0000;        // Fehler, Drehwinkel außerhalb Wertebereich --> Keine Ansteuerung
             }
+//            switch (read_HallSensors()) {
+//                case 6: OVDCON = 0x0210;
+//                    break;
+//                case 5: OVDCON = 0x0801;
+//                    break;
+//                case 4: OVDCON = 0x0810;
+//                    break;
+//                case 3: OVDCON = 0x2004;
+//                    break;
+//                case 2: OVDCON = 0x0204;
+//                    break;
+//                case 1: OVDCON = 0x2001;
+//                    break;
+//                default: OVDCON = 0x0000;
+//                    break;
+//            }
         }
         // Ende Kommutierung Drehwinkel
     }

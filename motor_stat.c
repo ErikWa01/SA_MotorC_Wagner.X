@@ -12,8 +12,8 @@
 
 // Variablendeklaration
 int drehzahl;           // mechanische Drehzhal in U/min
-unsigned int drehwinkel;    // elektrischer Drehwinkel in x * 0,0075 °
-unsigned int last_drehwinkel;   // Speichern des zuletzt geschriebenen Drehwinkels
+long drehwinkel;    // elektrischer Drehwinkel in x * 0,0075 °
+long last_drehwinkel;   // Speichern des zuletzt geschriebenen Drehwinkels
 long drehwinkel_difference;     // Speichern der Differenz des Drehwinkels (int ist zu klein fuer +-40000)
 int direction;                  // 0 fuer vorwaerts, 1 fuer rueckwaerts
 int drehwinkel_valid;         // Wenn der Drehwinkel gueltig bestimmt werden kann 1, sonst 0
@@ -24,7 +24,7 @@ int val_count;                      // Speichert ob wie viele Werte fuer Tiefpas
 unsigned long temp;           // Variable zum Voruebergehenden Speichern des MSW der Timer Zaehlvariable
 unsigned long timer_endval;   // Variable zum Setzen des neuen Endwerts des Timers entsprechend der Winkelgeschwindigkeit
 unsigned long time_hall_change;
-unsigned int drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeicher hat
+long drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeicher hat
 
 
 /* Funktion zur Initialisierung der Hall-Sensoren und des AD-Wandlers */
@@ -94,25 +94,34 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         TMR3HLD = 0x0000;   // Zuruecksetzen der Zaehlvariable  (MSW)
         TMR2 = 0x0000;      // des Timers                       (LSW)
         
-        // Tiefpass --> ueber 6 Hallaenderungen --> 1 Kommutierungszyklus
-        timer_val_array[0] = timer_val;             // Speichern des zuletzt gelesenen Wertes
-        if(val_count < 6)                           // val_count ist entweder Anzahl der geschriebenen Werte oder maximal 6
+        time_hall_change = tiefpass_timer(timer_val);       // Tiefpass filtern der Zeit
+        
+        // Drehwinkel erst gueltig, wenn 6 Hallsensorinterrupts, also 1 Kommutierungszyklus durchlaufen ist
+        if(val_count < 6)
         {
-            val_count++;                            // Ein weiterer Wert wurde geschrieben
+            val_count++;
         }else{
-            drehwinkel_valid = 1;                   // Erst wenn 6 Werte geschrieben wurden --> Also 1 Kommutierugszyklus durchlaufen ist kann Drehwinkel als gueltig bestimmt angesehen werden
+            drehwinkel_valid = 1;
         }
-        time_hall_change = 0;                       // Ruecksetzen des Ausgangs des Tiefpass
-        for(i = 0; i < val_count; i++)
-        {
-            time_hall_change += timer_val_array[i] / val_count;     // Ausgang des Tiefpass (Zeit, zwischen zwei Hallsensorwechseln) ist gemittelter Wert ueber
-        }                                                           // die Anzahl der bisher geschriebenen Werte oder maximal 6
-        // Verschieben der Werte im Tiefpass-Array um 1 nach hinten
-        for(i = 0; i < 5; i++)
-        {
-            timer_val_array[i+1] = timer_val_array[i];
-        }
-        //Ende Tiefpass
+//        // Tiefpass --> ueber 6 Hallaenderungen --> 1 Kommutierungszyklus
+//        timer_val_array[0] = timer_val;             // Speichern des zuletzt gelesenen Wertes
+//        if(val_count < 6)                           // val_count ist entweder Anzahl der geschriebenen Werte oder maximal 6
+//        {
+//            val_count++;                            // Ein weiterer Wert wurde geschrieben
+//        }else{
+//            drehwinkel_valid = 1;                   // Erst wenn 6 Werte geschrieben wurden --> Also 1 Kommutierugszyklus durchlaufen ist kann Drehwinkel als gueltig bestimmt angesehen werden
+//        }
+//        time_hall_change = 0;                       // Ruecksetzen des Ausgangs des Tiefpass
+//        for(i = 0; i < val_count; i++)
+//        {
+//            time_hall_change += timer_val_array[i] / val_count;     // Ausgang des Tiefpass (Zeit, zwischen zwei Hallsensorwechseln) ist gemittelter Wert ueber
+//        }                                                           // die Anzahl der bisher geschriebenen Werte oder maximal 6
+//        // Verschieben der Werte im Tiefpass-Array um 1 nach hinten
+//        for(i = 0; i < 5; i++)
+//        {
+//            timer_val_array[i+1] = timer_val_array[i];
+//        }
+//        //Ende Tiefpass
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];         // Bestimmung des aktuellen elektrischen Drehwinkels anhand Hallstatus
         drehwinkel_difference = drehwinkel - last_drehwinkel;          // Bestimmung der Differenz aus aktuellem und neuem
@@ -143,7 +152,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         timer_endval = 2 * time_hall_change;             // Neuer Endwert des Timers wird so gesetzt, dass Timer in Ueberlauf kommt, wenn 2 mal die Zeit fuer einen Hallsensorstatuswechsel durchlaufen ist
         if(timer_endval > 1600000)
         {
-            timer_endval = 1600000;
+            timer_endval = 1600000;                 // Begrenzung des maximalen Timerendwerts --> Wenn Drehzahl noch langsamer wird keine sinnvolle Bestimmung des Drehwinkels mehr moeglich
         }
         PR3 = (timer_endval & 0xFFFF0000) >> 16;    // Neuer Endwert in entsprechendes
         PR2 = timer_endval & 0x0000FFFF;            // Register des Timers
@@ -164,13 +173,12 @@ void calc_motor_position()
     // Wenn Zahl hoeher als 360° (entspricht 48000)
     if(drehwinkel >= 48000)
     {
-        if(drehwinkel > 60000)  // Annahme: Wenn Zahl ueber 60000 hohe Zahl durch negativen Ueberlauf entstanden
-        {
-            // Bei negativem Ueberlauf ist Zahl: negativer Drehwinkel + hoechste Darstellbare Zahl + 1 = negativer Drehwinkel + 65536
-            drehwinkel = 48000 - (65536 - drehwinkel);  // Rueckrechnung: Winkel eigentlich 360° minus Betrag des negativen Drehwinkels
-        }else{
-            drehwinkel -= 48000;  // Wenn Zahl unter 60000, aber ueber 48000 ist Winkel ueber 360° --> 360° ist neue 0°
-        }
+        drehwinkel -= 48000;  // Wenn Zahl ueber 48000 ist, Winkel ueber 360° --> 360° ist neue 0°
+    }
+    // Wenn Zahl negativ ist --> negativer Ueberlauf
+    if(drehwinkel < 0)
+    {
+        drehwinkel += 48000;
     }
 }
 
@@ -210,4 +218,24 @@ int get_drehwinkel()
 int drehwinkel_is_valid()
 {
     return drehwinkel_valid;
+}
+
+
+/* Tiefpassfilter nach "Digitale rekursive Filter mit einfachen Mikrocontrollern"
+ * Übergabeparameter:
+ *  - neuer Eingangswert, long (hier: Timerwert)
+ * Rückgabeparameter:
+ *  - gefilterter Asugangswert, long
+ * 
+ * Filterparameter:
+ *  - k = 4
+ *  - n = 2^k = 16
+ * */
+long tiefpass_timer(long x)
+{
+    static long _2nw;   // 2n * w
+    long _2ny;          // 2n * y
+    _2ny = x + _2nw;    // (2n*b0) * x = 1*x
+    _2nw = x + _2ny - (_2ny>>4);    // _2ny>>k = _2ny/n = 2y
+    return _2ny>>(5);   // return y = _2ny>>(k+1) = _2ny/2n
 }

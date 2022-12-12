@@ -20,6 +20,7 @@ int get_drehzahl();
 int get_drehwinkel();
 int read_HallSensors();
 int drehwinkel_is_valid();
+long tiefpass_timer(long x);
 
 
 #ifdef	__cplusplus
