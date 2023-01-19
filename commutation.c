@@ -52,10 +52,15 @@ void motor_commutation()
     speed = getDesSpeed();
     el_drehwinkel = get_drehwinkel();
     
+//    if(speed == 0){
+//        OVDCON = 0x0015;
+//        return;
+//    }
+    
     /* Aktualisierung der Geschwindigkeit */
-    PDC1 = (speed / 9.0) * DUTY;
-    PDC2 = (speed / 9.0) * DUTY;
-    PDC3 = (speed / 9.0) * DUTY;
+    PDC1 = ((speed/10.0) / 9.0) * DUTY;
+    PDC2 = ((speed/10.0) / 9.0) * DUTY;
+    PDC3 = ((speed/10.0) / 9.0) * DUTY;
     
     // Wenn Drehwinkel gueltig bestimmt wurde, Kommutierung anhand Drehwinkel
     if(drehwinkel_is_valid()){

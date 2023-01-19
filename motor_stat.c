@@ -33,7 +33,7 @@ void motor_stat_init() {
     TRISB |= 0x38;      // Festlegung des Inputs (TRISB2, TRISB3, TRISB4 sind Inputs)
     ADPCFG |= 0x38;     // RB3 - RB5 sind digital
     CNEN1 = 0xE0;       // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
-    IPC3bits.CNIP = 7;  // Setzen der Interrupt-Prioritaet auf die Hoechste
+    IPC3bits.CNIP = 7;  // Setzen der Interrupt-Prioritaet auf die Hoechste --> Nicht niedriger, sonst Probleme
     IFS0bits.CNIF = 0;  // Loeschen moeglicher ausgeloester Interrupts
 
     // Timer fuer Zeitmessung (nutzen des TIMER2/3 Moduls im 32-Bit-Modus)
@@ -69,12 +69,10 @@ void motor_stat_init() {
 
 /* Erkennung einer Statusaenderung der Hall Sensoren */
 void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
-{
-    int i;      // Laufvariable for-Schleife
-    
+{   
     IFS0bits.CNIF = 0; // loeschen des Interrupt-Flags
     
-    // Pruefen ob dies der erste Aufuruf des Interrupts, nachdem Drehzahl_valid = 0 gesetzt wurde
+    // Pruefen ob dies der erste Aufuruf des Interrupts ist, nachdem Drehzahl_valid = 0 gesetzt wurde
     if(first_call)
     {
         TMR3HLD = 0x0000;   // Zuruecksetzen der Zaehlvariable  (MSW)

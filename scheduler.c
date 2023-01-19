@@ -59,6 +59,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         // Aufruf motor_stat und commutation
         calc_motor_position();
         motor_commutation();
+//        OVDCON = 0x0015;
     }
     
     // Aufrufen des ersten Task, wenn Zaehlervariable Endwert erreicht hat

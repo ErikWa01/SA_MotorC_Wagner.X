@@ -64,7 +64,7 @@ void send_msg(char *msg)
 /* Interrupt zum senden von Nachrichten*/
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt(void) {
     
-    IFS1bits.U2TXIF = 0;    // TX-Interrupt-Flag löschen
+    IFS1bits.U2TXIF = 0;    // TX-Interrupt-Flag loeschen
     
     if(send_msg_flag == 1)   // Pruefen ob Nachricht gesendet werden soll
     {

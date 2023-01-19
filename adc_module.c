@@ -31,7 +31,7 @@ void adc_init() {
     ADCON1bits.SSRC = 0x7;  // Auto Convert
     IPC2bits.ADIP = 5;      // Setzen der Interruptprioritaet niedriger als Timer und Hallsensoren
     IFS0bits.ADIF = 0;      // Ruecksetzen des ADC-Interrupt-Flags
-    IEC0bits.ADIE = 1;      // Aktivieren der ADC-Interrupts
+    IEC0bits.ADIE = 1;      // Aktivieren des ADC-Interrupts
     ADCON1bits.ADON = 1;    // Aktivierung des ADC
 }
 
