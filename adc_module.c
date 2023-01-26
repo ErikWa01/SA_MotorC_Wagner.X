@@ -52,6 +52,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt(void)
         I_motor_ADval_temp = I_motor_ADval_temp + *AD_Buf_ptr++;  // Addieren des Buffers und erhoehen des Bufferpointers
     }
     
+//    I_motor_ADval = I_motor_ADval_temp / 8 - 508;
     I_motor_ADval = tiefpass_adc(I_motor_ADval_temp * 3) - 12156;   // Filtern des Stromwertes mit Tiefpass und Mittelung um 0, gleichzeitig erhoehen der Aufloesung
 }
 
@@ -78,5 +79,5 @@ int tiefpass_adc(int x)
     long _2ny;          // 2n * y
     _2ny = x + _2nw;    // (2n*b0) * x = 1*x
     _2nw = x + _2ny - (_2ny>>10);    // _2ny>>k = _2ny/n = 2y
-    return _2ny>>(11);   // return y = _2ny>>(k+1) = _2ny/2n
+    return _2ny>>(10+1);   // return y = _2ny>>(k+1) = _2ny/2n
 }

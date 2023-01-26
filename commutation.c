@@ -17,6 +17,7 @@
 #define VKOMW 2667              // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
 
 char richtung;
+char control_mode;
 float speed;
 unsigned int el_drehwinkel;
 float startspeed = 0;
@@ -51,16 +52,48 @@ void motor_commutation()
     richtung = getDesRichtung();
     speed = getDesSpeed();
     el_drehwinkel = get_drehwinkel();
+    control_mode = get_des_control_mode();
+    
     
 //    if(speed == 0){
 //        OVDCON = 0x0015;
 //        return;
 //    }
     
+    // Wenn Steuerungsmodus auf Bremsen gestellt wurde
+    if(control_mode == 'b')
+    {
+        /* Aktualisierung des Tastverhaeltnisses */
+        PDC1 = (1 - speed / 9.0) * DUTY;
+        PDC2 = (1 - speed / 9.0) * DUTY;
+        PDC3 = (1 - speed / 9.0) * DUTY;
+        
+        // Ansteuerung der Motortreiberschaltung zum Bremsen anhand der Hallsensoren
+        // Abfrage des Hall-Status mit anschlie√?ender Motorkommutierung
+        switch (read_HallSensors()) {
+            case 1: OVDCON = 0x0110;
+                break;
+            case 2: OVDCON = 0x0401;
+                break;
+            case 3: OVDCON = 0x0410;
+                break;
+            case 4: OVDCON = 0x1004;
+                break;
+            case 5: OVDCON = 0x0104;
+                break;
+            case 6: OVDCON = 0x1001;
+                break;
+            default: OVDCON = 0x0000;
+                break;
+        }
+        
+        return;
+    }
+    
     /* Aktualisierung der Geschwindigkeit */
-    PDC1 = ((speed/10.0) / 9.0) * DUTY;
-    PDC2 = ((speed/10.0) / 9.0) * DUTY;
-    PDC3 = ((speed/10.0) / 9.0) * DUTY;
+    PDC1 = (speed / 9.0) * DUTY;
+    PDC2 = (speed / 9.0) * DUTY;
+    PDC3 = (speed / 9.0) * DUTY;
     
     // Wenn Drehwinkel gueltig bestimmt wurde, Kommutierung anhand Drehwinkel
     if(drehwinkel_is_valid()){

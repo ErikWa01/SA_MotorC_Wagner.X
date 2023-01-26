@@ -29,13 +29,16 @@ void handle_msg_rx(char *msg)
     msg_rx = msg;
     // Falls 'msg_rx[0]' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
     if (msg_rx[0] == 118 || msg_rx[0] == 114) {
-        // �?berprüfung einer gewünschten Richtungsänderung durch Vergleich zwischen Kommandobefehl und aktueller Drehrichtung
-        set_des_dir(msg_rx[0]);
+//        set_des_dir(msg_rx[0]);
     } 
-        
-    // Falls 'msg_rx[0]' keine der beiden Buchstaben 'v' oder 'r' enthält, könnte Befehl eine Geschwindigkeitsänderung sein... 
-    else {
-        // Umwandlung von char 'msg_rx[0]' in eine float-Variable 'msg_rx[0]'
+    // Enthaelt msg_rx[0] den Buchstaben b oder s wird Modus Bremsstufe oder Geschwindigkeit (Speed) ausgew�hlt
+    else if(msg_rx[0] == 98 || msg_rx[0] == 115){
+        set_des_control_mode(msg_rx[0]);
+    }
+    // Falls 'msg_rx[0]' keine der Buchstaben 'v', 'r', 'b' oder 's' enthält, könnte Befehl eine Geschwindigkeitsänderung sein...
+    else
+    {
+        // Umwandlung von char 'msg_rx[0]' in eine float-Variable 'msg_speed'
         msg_speed = msg_rx[0] - 48;
 
         // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gewünschte Geschwindigkeitsänderung gesendet

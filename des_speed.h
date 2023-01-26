@@ -15,8 +15,10 @@ extern "C" {
     /* Funktionsprototypen */
     char getDesRichtung();
     float getDesSpeed();
+    char get_des_control_mode();
     void set_des_dir(char desRtg);
     void set_des_speed(float des_speed);
+    void set_des_control_mode(char des_mode);
 
 #ifdef	__cplusplus
 }
