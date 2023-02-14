@@ -30,7 +30,7 @@ long drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hal
 /* Funktion zur Initialisierung der Hall-Sensoren und des AD-Wandlers */
 void motor_stat_init() {    
     // Hallsensoren
-    TRISB |= 0x38;      // Festlegung des Inputs (TRISB2, TRISB3, TRISB4 sind Inputs)
+    TRISB |= 0x38;      // Festlegung des Inputs (TRISB3, TRISB4, TRISB5 sind Inputs)
     ADPCFG |= 0x38;     // RB3 - RB5 sind digital
     CNEN1 = 0xE0;       // Aktivieren der Interruptausloesung an den Eingaengen der Hall-Sensoren
     IPC3bits.CNIP = 7;  // Setzen der Interrupt-Prioritaet auf die Hoechste --> Nicht niedriger, sonst Probleme

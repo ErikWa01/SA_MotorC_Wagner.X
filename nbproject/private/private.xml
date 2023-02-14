@@ -5,6 +5,7 @@
         <group>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/uart_com.h</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/global_const.h</file>
+            <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/nbproject/Makefile-default.mk</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/uart_com.c</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/scheduler.h</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/main.c</file>
@@ -14,6 +15,7 @@
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/adc_module.c</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/com_interface.c</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/motor_stat.h</file>
+            <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/adc_module.h</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/commutation.h</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/scheduler.c</file>
             <file>file:/C:/Users/erikw/MPLABXProjects/SA_MotorC_Wagner.X/commutation.c</file>

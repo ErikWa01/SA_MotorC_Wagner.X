@@ -14,7 +14,7 @@
 /* Definition von Konstanten */
 #define FPWM 20000          // Definition der Frequenz (PWM) 
 #define DUTY 2*(FCY/FPWM - 1)  // Definition des Duty-Cycle (Tastgrad) der PWM
-#define VKOMW 2667              // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
+#define VKOMW 2667             // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
 
 char richtung;
 char control_mode;
@@ -86,6 +86,26 @@ void motor_commutation()
             default: OVDCON = 0x0000;
                 break;
         }
+//        PDC1 = (1 / 9.0) * DUTY; 
+//        PDC2 = (1 / 9.0) * DUTY;
+//        PDC3 = (1 / 9.0) * DUTY;
+        
+//        switch (read_HallSensors()) {
+//            case 6: OVDCON = 0x0210;
+//                break;
+//            case 5: OVDCON = 0x0801;
+//                break;
+//            case 4: OVDCON = 0x0810;
+//                break;
+//            case 3: OVDCON = 0x2004;
+//                break;
+//            case 2: OVDCON = 0x0204;
+//                break;
+//            case 1: OVDCON = 0x2001;
+//                break;
+//            default: OVDCON = 0x0000;
+//                break;
+//        }
         
         return;
     }

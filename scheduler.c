@@ -35,9 +35,9 @@ void scheduler_init()
     tmr_count_task1 = 0;    // Initialisieren der Variable auf 0
     tmr_count_task2 = 0;    // Initialisieren der Variable auf 0
     tmr_count_task3 = 0;    // Initialisieren der Variable auf 0
-    tmr_trig_task1 = 1;     // Aufruf des Task 1 nach 1 Timerdurchlauf
-    tmr_trig_task2 = 50;    // Aufruf des Task 2 nach 50 Timerdurchlaeufen
-    tmr_trig_task3 = 500;  // Aufruf des Task 3 nach 5000 Timerdurchlaeufen
+    tmr_trig_task1 = 1;     // Aufruf des Task 1 nach 1 Timerdurchlauf (200 µs)
+    tmr_trig_task2 = 50;    // Aufruf des Task 2 nach 50 Timerdurchlaeufen (10 ms)
+    tmr_trig_task3 = 500;  // Aufruf des Task 3 nach 500 Timerdurchlaeufen (100 ms)
     
     T1CONbits.TON = 1;      // Starten des Timers
 }
@@ -77,5 +77,6 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         send_current();      // Motorstrom ueber UART senden
 //        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
 //        send_drehwinkel();    // Drehwinkel ueber UART senden
+//        send_control_2_ADval();     // Wert des Pins 2 des Control-Anschlusses ueber UART senden
     }
 }

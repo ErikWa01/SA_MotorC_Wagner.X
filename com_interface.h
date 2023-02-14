@@ -18,6 +18,7 @@ extern "C" {
     void send_current();
     void send_motor_stat();
     void send_drehwinkel();
+    void send_control_2_ADval();
     int itoa(int value, char *str, int is_signed);
 
 

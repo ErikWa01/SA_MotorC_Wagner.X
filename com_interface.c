@@ -98,6 +98,16 @@ void send_drehwinkel()
     send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
 }
 
+//Funktion zum Senden des Eingangswertes an Control-Anschluss Pin 2
+void send_control_2_ADval()
+{
+    string_ende = itoa(get_control_2_ADval(), msg_tx, 0);   // Wandeln des Integerwertes in einen String und Speichern im msg_tx-Char-Array
+    msg_tx[string_ende++] = '\n';   // Erzeugen eines Zeilenumbruchs nach dem Wert
+    msg_tx[string_ende] = '\0';     // Setzen des Ende des Strings
+    
+    send_msg(msg_tx);               // Uebergabe der Nachricht an UART-Kommmunikationsmodul
+}
+
 /* Funktion zum Umwandeln eines signed oder unsigned Integer in einen String
  * 
  * Übergabeparameter:
