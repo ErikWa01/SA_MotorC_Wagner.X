@@ -12,19 +12,19 @@
 
 // Variablendeklaration
 int drehzahl;           // mechanische Drehzhal in U/min
-long drehwinkel;    // elektrischer Drehwinkel in x * 0,0075 °
-long last_drehwinkel;   // Speichern des zuletzt geschriebenen Drehwinkels
-long drehwinkel_difference;     // Speichern der Differenz des Drehwinkels (int ist zu klein fuer +-40000)
+int drehwinkel;         // elektrischer Drehwinkel in ca. x * 0,0055 °
+int last_drehwinkel;    // Speichern des zuletzt geschriebenen Drehwinkels
+int drehwinkel_difference;      // Speichern der Differenz des Drehwinkels
 int direction;                  // 0 fuer vorwaerts, 1 fuer rueckwaerts
-int drehwinkel_valid;         // Wenn der Drehwinkel gueltig bestimmt werden kann 1, sonst 0
-int first_call;         // Wenn Hallsensoren Interrupt nach ungueltiger Drehzahl noch nicht aufgerufen wurde 1, sonst 0
-unsigned long timer_val;      // Variable zum Auslesen der aktuellen Timer Zaehlvariable
+int drehwinkel_valid;           // Wenn der Drehwinkel gueltig bestimmt werden kann 1, sonst 0
+int first_call;                 // Wenn Hallsensoren Interrupt nach ungueltiger Drehzahl noch nicht aufgerufen wurde 1, sonst 0
+unsigned long timer_val;        // Variable zum Auslesen der aktuellen Timer Zaehlvariable
 unsigned long timer_val_array[6];   // Array fuer Tiefpass
-int val_count;                      // Speichert ob wie viele Werte fuer Tiefpassberechnung bereits gespeichert wurden
+int val_count;                      // Speichert wie oft Hallsensorinterrupt bereits aufgerufen wurde
 unsigned long temp;           // Variable zum Voruebergehenden Speichern des MSW der Timer Zaehlvariable
 unsigned long timer_endval;   // Variable zum Setzen des neuen Endwerts des Timers entsprechend der Winkelgeschwindigkeit
 unsigned long time_hall_change;
-long drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeicher hat
+int drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeichert hat
 
 
 /* Funktion zur Initialisierung der Hall-Sensoren und des AD-Wandlers */
@@ -56,12 +56,12 @@ void motor_stat_init() {
     time_hall_change = 0xFFFFFFFF;
     
     // drehwinkel_array fuellen
-    drehwinkel_array[0] = 40000;       // Hallstatus 1: In Kommutierungsreihenfolge Platz 5 --> 300°
-    drehwinkel_array[1] = 24000;       // Hallstatus 2: In Kommutierungsreihenfolge Platz 3 --> 180°
-    drehwinkel_array[2] = 32000;       // Hallstatus 3: In Kommutierungsreihenfolge Platz 4 --> 240°
-    drehwinkel_array[3] = 8000;        // Hallstatus 4: In Kommutierungsreihenfolge Platz 1 --> 60°
-    drehwinkel_array[4] = 0;           // Hallstatus 5: In Kommutierungsreihenfolge Platz 0 --> 0°
-    drehwinkel_array[5] = 16000;       // Hallstatus 6: In Kommutierungsreihenfolge Platz 2 --> 120°
+    drehwinkel_array[0] = 0xD555;       // Hallstatus 1: In Kommutierungsreihenfolge Platz 5 --> 300°
+    drehwinkel_array[1] = 0x8000;       // Hallstatus 2: In Kommutierungsreihenfolge Platz 3 --> 180°
+    drehwinkel_array[2] = 0xAAAB;       // Hallstatus 3: In Kommutierungsreihenfolge Platz 4 --> 240°
+    drehwinkel_array[3] = 0x2AAB;       // Hallstatus 4: In Kommutierungsreihenfolge Platz 1 --> 60°
+    drehwinkel_array[4] = 0x0000;       // Hallstatus 5: In Kommutierungsreihenfolge Platz 0 --> 0°
+    drehwinkel_array[5] = 0x5555;       // Hallstatus 6: In Kommutierungsreihenfolge Platz 2 --> 120°
     
     IEC0bits.CNIE = 1;  // Aktivieren des Input Change Interrupts (Hall Sensoren)
     T2CONbits.TON = 1;  // Starten des Timers 2/3 fuer Zeitmessung
@@ -125,25 +125,10 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         drehwinkel_difference = drehwinkel - last_drehwinkel;          // Bestimmung der Differenz aus aktuellem und neuem
         
         // Bestimmung der Richtung
-        if(drehwinkel_difference < 0)           // Wenn Differenz < 0, dann ist Richung rueckwaerts
-        {
-            if(drehwinkel_difference != -40000) // Ausnahme: Von 360° auf 0°
-            {
-                direction = 1;      // Richtung ist rueckwaerts
-            }else{
-                direction = 0;      // Richtung ist vorwaerts
-            }
-        }else{                                  // Wenn Differenz > 0, dann ist Richtung vorwaerts
-            if(drehwinkel_difference != 40000)  // Ausnahme: von 0° auf 360°
-            {
-                direction = 0;      // Richtung ist vorwaerts
-            }else{
-                direction = 1;      // Richtung ist rueckwaerts
-            }
-        }
+        direction = (drehwinkel_difference > 0) ? 0 : 1;         // Wenn Differenz > 0, dann ist Richung vorwärts (rechtslauf, 0), sonst rueckwaerts (linkslauf, 1)
         
 //        drehwinkel_valid = 1;                     // Drehwinkel wurde gueltig bestimmt
-        last_drehwinkel = drehwinkel;             // Speichern des aktuellen Drehwinkels als alten Drehwinkelwert
+        last_drehwinkel = drehwinkel;               // Speichern des aktuellen Drehwinkels als alten Drehwinkelwert
         
         // Neuer Endwert des Timers --> Ueberlauf des Timers soll verhindern, dass durch Programm bestimmter Drehwinkel dem tatsaechlichen weit voraus ist und somit Kommutierung falsch laeuft
         // Außerdem somit Erkennung, wenn Drehzahl 0 wird
@@ -158,25 +143,14 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 }
 
 /* Funktion, zur Drehwinkelbestimmung anhand der aktuellen Winkelgeschwindigkeit
- * muss alle 200 µs aufgerufen werden --> fcalc = 5 kHz */
+ * muss alle 200 µs aufgerufen werden --> tcalc = 3200 * Tcy */
 void calc_motor_position()
 {
     if(direction == 0)
     {
-        drehwinkel += ((FCY/5000) * 8000)/time_hall_change;     // drehwinkel += ((FCY/fcalc) * 8000 / x; hier: FCY = 16 MHz, fcalc = 5 kHz
+        drehwinkel += 34953600/time_hall_change;     // drehwinkel += (3200 * Tcy / x * Tcy) * 60° --> 3200 * 10923 / x
     }else if(direction == 1){
-        drehwinkel -= ((FCY/5000) * 8000)/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
-    }
-    
-    // Wenn Zahl hoeher als 360° (entspricht 48000)
-    if(drehwinkel >= 48000)
-    {
-        drehwinkel -= 48000;  // Wenn Zahl ueber 48000 ist, Winkel ueber 360° --> 360° ist neue 0°
-    }
-    // Wenn Zahl negativ ist --> negativer Ueberlauf
-    if(drehwinkel < 0)
-    {
-        drehwinkel += 48000;
+        drehwinkel -= 34953600/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
     }
 }
 

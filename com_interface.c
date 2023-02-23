@@ -29,7 +29,7 @@ void handle_msg_rx(char *msg)
     msg_rx = msg;
     // Falls 'msg_rx[0]' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
     if (msg_rx[0] == 118 || msg_rx[0] == 114) {
-//        set_des_dir(msg_rx[0]);
+        set_des_dir(msg_rx[0]);
     } 
     // Enthaelt msg_rx[0] den Buchstaben b oder s wird Modus Bremsstufe oder Geschwindigkeit (Speed) ausgew�hlt
     else if(msg_rx[0] == 98 || msg_rx[0] == 115){

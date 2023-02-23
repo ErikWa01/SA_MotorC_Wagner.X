@@ -21,7 +21,7 @@ void set_des_dir(char desRtg)
     if (desRtg != des_richtung)
     {
         //Kurzeitiges Verlangsamen des Motors
-        des_speed = 1;
+        des_speed = 0;
         // Aktualisierung der Richtung
         des_richtung = desRtg;
     }

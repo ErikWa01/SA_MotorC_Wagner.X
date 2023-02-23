@@ -74,8 +74,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     {
         tmr_count_task3 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf einer Wiederkehrenden Kommunikationsnachricht
-        send_current();      // Motorstrom ueber UART senden
-//        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
+//        send_current();      // Motorstrom ueber UART senden
+        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
 //        send_drehwinkel();    // Drehwinkel ueber UART senden
 //        send_control_2_ADval();     // Wert des Pins 2 des Control-Anschlusses ueber UART senden
     }
