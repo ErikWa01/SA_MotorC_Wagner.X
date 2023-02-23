@@ -1,3 +1,6 @@
-build/default/production/adc_module.o: adc_module.c motor_stat.h
+build/default/production/adc_module.o: adc_module.c motor_stat.h \
+ adc_module.h
 
 motor_stat.h:
+
+adc_module.h:
