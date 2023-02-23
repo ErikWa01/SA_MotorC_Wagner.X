@@ -49,7 +49,7 @@ void PWM_Init() {
 
 void motor_commutation()
 {
-    richtung = getDesRichtung();
+    richtung = get_direction();
     speed = getDesSpeed();
     el_drehwinkel = get_drehwinkel();
     control_mode = get_des_control_mode();
@@ -118,7 +118,7 @@ void motor_commutation()
     // Wenn Drehwinkel gueltig bestimmt wurde, Kommutierung anhand Drehwinkel
     if(drehwinkel_is_valid()){
         // Abfrage der Richtung
-        if(richtung == 118)             // Richtung ist vorwaerts
+        if(richtung == 0)             // Richtung ist vorwaerts
         {
             el_drehwinkel += VKOMW;     // Bestimmung des el_drehwinkels unter Ber¸cksichtigung der Vorkommutierung
 
@@ -145,7 +145,7 @@ void motor_commutation()
                 OVDCON = 0x0000;        // Fehler, Drehwinkel auﬂerhalb Wertebereich --> Keine Ansteuerung
             }
         }
-        else if(richtung == 114)    // Richtung ist rueckwaerts   
+        else if(richtung == 1)    // Richtung ist rueckwaerts   
         {
             el_drehwinkel -= VKOMW;     // Bestimmung des el_drehwinkels unter Ber¸cksichtigung der Vorkommutierung
 
@@ -193,7 +193,7 @@ void motor_commutation()
     else
     {
         // Ansonsten Kommutierung anhand der Hallsensoren
-        if (richtung == 118) {
+        if (richtung == 0) {
             // Abfrage des Hall-Status mit anschlie√?ender Motorkommutierung
             switch (read_HallSensors()) {
                 case 1: OVDCON = 0x0210;
@@ -212,7 +212,7 @@ void motor_commutation()
                     break;
             }
         }// Falls 'richtung' den Buchstaben 'r' enth√§lt, dann R√ºckw√§rtsbewegung...
-        else if (richtung == 114) {
+        else if (richtung == 1) {
             switch (read_HallSensors()) {
                 case 6: OVDCON = 0x0210;
                     break;

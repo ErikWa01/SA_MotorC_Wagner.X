@@ -21,9 +21,11 @@ int first_call;                 // Wenn Hallsensoren Interrupt nach ungueltiger 
 unsigned long timer_val;        // Variable zum Auslesen der aktuellen Timer Zaehlvariable
 unsigned long timer_val_array[6];   // Array fuer Tiefpass
 int val_count;                      // Speichert wie oft Hallsensorinterrupt bereits aufgerufen wurde
-unsigned long temp;           // Variable zum Voruebergehenden Speichern des MSW der Timer Zaehlvariable
-unsigned long timer_endval;   // Variable zum Setzen des neuen Endwerts des Timers entsprechend der Winkelgeschwindigkeit
-unsigned long time_hall_change;
+unsigned long timer_val_temp;           // Variable zum Voruebergehenden Speichern des MSW der Timer Zaehlvariable
+unsigned long timer_endval;             // Variable zum Setzen des neuen Endwerts des Timers entsprechend der Winkelgeschwindigkeit
+unsigned long time_hall_change;         // Variable zum Speichern des gefilterten Wertes der vergangenen Zeit zwischen zwei Hallsensoren
+unsigned long time_since_hall;          // Variable zum Auslesen der Zeit, die seit einem Hallsensorinterrupt vergangen ist
+unsigned long time_since_hall_temp;     // Variable zum temporaeren Speichern der MSW der time_since_hall-Variable
 int drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeichert hat
 
 
@@ -87,8 +89,8 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         first_call = 0;     // Interrupt wurde einmal aufgerufen
     }else{
         timer_val = TMR2;       // Auslesen der vergangenen Zeit LSW
-        temp = TMR3HLD;         // MSW Speichern
-        timer_val += (temp << 16);    // Gesamtwert berechnen
+        timer_val_temp = TMR3HLD;         // MSW Speichern
+        timer_val += (timer_val_temp << 16);    // Gesamtwert berechnen
         TMR3HLD = 0x0000;   // Zuruecksetzen der Zaehlvariable  (MSW)
         TMR2 = 0x0000;      // des Timers                       (LSW)
         
@@ -146,11 +148,29 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
  * muss alle 200 µs aufgerufen werden --> tcalc = 3200 * Tcy */
 void calc_motor_position()
 {
-    if(direction == 0)
+    // Auslesen der Zeit, die seit dem letzten Hallsensorinterrupt vergangen ist
+    time_since_hall = TMR2;                             // Auslesen des LSW der Zeit seit dem letzten Hallsensorinterrupt
+    time_since_hall_temp = TMR3HLD;                     // MSW Speichern
+    time_since_hall += (time_since_hall_temp << 16);    // Gesamtwert berechnen
+    
+    // Wenn die Zeit kleiner als 200 µs ist, dann kann nicht die 200 µs Zykluszeit zur Berechnung des vergangenen Drehwinkels angenommen werden
+    // Es muss stattdessen die vergangene Zeit berücksichtigt werden
+    if(time_since_hall < 3200)
     {
-        drehwinkel += 34953600/time_hall_change;     // drehwinkel += (3200 * Tcy / x * Tcy) * 60° --> 3200 * 10923 / x
-    }else if(direction == 1){
-        drehwinkel -= 34953600/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
+        if(direction == 0)
+        {
+            drehwinkel += (time_since_hall * 10923)/time_hall_change;     // drehwinkel += (time_since_hall * Tcy / x * Tcy) * 60° --> time_since_hall * 10923 / x
+        }else if(direction == 1){
+            drehwinkel -= (time_since_hall * 10923)/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
+        }
+    }else{
+        // Ist die Zeit größer oder gleich 200 µs kann die Zykluszeit des Aufrufs der Berechnungsfunktion (200 µs) fuer die Berechung verwendet werden
+        if(direction == 0)
+        {
+            drehwinkel += 34953600L/time_hall_change;     // drehwinkel += (3200 * Tcy / x * Tcy) * 60° --> 3200 * 10923 / x
+        }else if(direction == 1){
+            drehwinkel -= 34953600L/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
+        }
     }
 }
 
@@ -190,6 +210,11 @@ int get_drehwinkel()
 int drehwinkel_is_valid()
 {
     return drehwinkel_valid;
+}
+
+int get_direction()
+{
+    return direction;
 }
 
 
