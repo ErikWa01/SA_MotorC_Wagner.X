@@ -35,6 +35,11 @@ void handle_msg_rx(char *msg)
     else if(msg_rx[0] == 98 || msg_rx[0] == 115){
         set_des_control_mode(msg_rx[0]);
     }
+    // Enthaelt msg_rx[0] das Zeichen '-' ist Sollspannung negativ anzusehen, bei '+' positiv
+    else if(msg_rx[0] == '-' || msg_rx[0] == '+')
+    {
+        set_volt_pos(msg_rx[0]);
+    }
     // Falls 'msg_rx[0]' keine der Buchstaben 'v', 'r', 'b' oder 's' enthält, könnte Befehl eine Geschwindigkeitsänderung sein...
     else
     {

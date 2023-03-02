@@ -16,9 +16,11 @@ extern "C" {
     char getDesRichtung();
     float getDesSpeed();
     char get_des_control_mode();
+    int des_volt_is_pos();
     void set_des_dir(char desRtg);
     void set_des_speed(float des_speed);
     void set_des_control_mode(char des_mode);
+    void set_volt_pos(char desVoltDir);
 
 #ifdef	__cplusplus
 }

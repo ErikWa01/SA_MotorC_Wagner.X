@@ -14,6 +14,7 @@
 float des_speed = 1;            // Geschwindigkeit der Rotation
 char des_richtung = 'v';              // Richtung der Rotation
 char des_control_mode = 's';
+int des_volt_pos = 1;
 
 // Funktion zum setzen einer neuen Drehrichtung
 void set_des_dir(char desRtg)
@@ -39,12 +40,22 @@ void set_des_control_mode(char des_mode)
     if(des_mode != des_control_mode)
     {
         // Setzen des Tastgrades auf 1 beim umschalten des Steuerungsmodus
-        des_speed = 1;
+        des_speed = 0;
         // Aktualisieren des Steuerungsmodus
         des_control_mode = des_mode;
     }
 }
 
+// Funktion zum Setzen der Vorgabe, ob Spannung negativ oder positiv sein soll
+void set_volt_pos(char desVoltDir)
+{
+    if(desVoltDir == '+')
+    {
+        des_volt_pos = 1;
+    }else if(desVoltDir == '-'){
+        des_volt_pos = 0;
+    }
+}
 
 char getDesRichtung()
 {
@@ -59,4 +70,9 @@ float getDesSpeed()
 char get_des_control_mode()
 {
     return des_control_mode;
+}
+
+int des_volt_is_pos()
+{
+    return des_volt_pos;
 }

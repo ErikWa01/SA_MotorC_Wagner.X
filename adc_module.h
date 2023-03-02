@@ -25,6 +25,7 @@ extern "C" {
     //double calc_I_from_ADval();
     int get_I_motor_ADval();
     int get_control_2_ADval();
+    int get_control_4_ADval();
     int tiefpass_adc(Filter *f, int x);
     void filterInit(Filter *f, int k, int x);
 

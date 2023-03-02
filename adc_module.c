@@ -100,6 +100,11 @@ int get_control_2_ADval()
     return control_2_ADval;
 }
 
+int get_control_4_ADval()
+{
+    return control_4_ADval;
+}
+
 int tiefpass_adc(Filter *f, int x)
 {
     long y = x + f->w;
