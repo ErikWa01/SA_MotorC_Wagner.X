@@ -13,11 +13,12 @@
 
 /* Definition von Konstanten */
 #define FPWM 20000          // Definition der Frequenz (PWM) 
-#define DUTY 2*(FCY/FPWM - 1)  // Definition des Duty-Cycle (Tastgrad) der PWM
+#define DUTY 2 * (FCY/FPWM - 1)  // Definition des Duty-Cycle (Tastgrad) der PWM
 #define VKOMW 0x0E39;          // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
 
 char richtung;
-//char control_mode;
+char control_mode;
+int duty_val;
 float speed;
 int el_drehwinkel;
 float startspeed = 0;
@@ -39,9 +40,9 @@ void PWM_Init() {
     PTPER = FCY / FPWM - 1;     // Einstellen der Periodendauer der PWM
     
     /* Einstellen der Tastgrade für alle drei PWM-Module */
-    PDC1 = (startspeed / 9.0) * DUTY; 
-    PDC2 = (startspeed / 9.0) * DUTY;
-    PDC3 = (startspeed / 9.0) * DUTY;
+    PDC1 = 0; 
+    PDC2 = 0;
+    PDC3 = 0;
 
     /* Initialisierung des PWM-Moduls */
     PTMR = 0; // Zurücksetzen des Timers
@@ -50,11 +51,12 @@ void PWM_Init() {
 
 void motor_commutation()
 {
+    control_mode = get_des_control_mode();
+    duty_val = get_des_duty_val();
     richtung = get_direction();
-    speed = getDesSpeed();
     volt_pos = des_volt_is_pos();
     el_drehwinkel = get_drehwinkel();
-//    control_mode = get_des_control_mode();
+
     
 /* Bremsen Testen */ 
 //    if(speed == 0){
@@ -111,11 +113,7 @@ void motor_commutation()
 //        
 //        return;
 //    }
-    
-    /* Aktualisierung der Geschwindigkeit */
-    PDC1 = (speed / 9.0) * DUTY;
-    PDC2 = (speed / 9.0) * DUTY;
-    PDC3 = (speed / 9.0) * DUTY;
+   
     
     /* Wenn Drehwinkel gueltig bestimmt wurde, Kommutierung anhand Drehwinkel */
     if(drehwinkel_is_valid()){
@@ -332,6 +330,11 @@ void motor_commutation()
 //            }
 //        }
     }
+    
+    /* Aktualisierung der Geschwindigkeit */
+    PDC1 = duty_val;
+    PDC2 = duty_val;
+    PDC3 = duty_val;
 }
 
 ///* Funktion zur Ver�nderung des PWM-Signals und zur Kommutierung */

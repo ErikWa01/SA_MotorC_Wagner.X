@@ -13,8 +13,9 @@ extern "C" {
 #endif
     
     /* Funktionsprototypen */
+    void calc_duty_from_AD();
     char getDesRichtung();
-    float getDesSpeed();
+    int get_des_duty_val();
     char get_des_control_mode();
     int des_volt_is_pos();
     void set_des_dir(char desRtg);

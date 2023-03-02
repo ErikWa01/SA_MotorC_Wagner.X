@@ -66,7 +66,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     if(tmr_count_task2 == tmr_trig_task2)
     {
         tmr_count_task2 = 0; // Ruecksetzen der Zaehlervariable
-        // Aufruf des_speed
+        calc_duty_from_AD();
     }
     
     // Aufrufen des ersten Task, wenn Zaehlervariable Endwert erreicht hat
@@ -75,8 +75,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         tmr_count_task3 = 0; // Ruecksetzen der Zaehlervariable
         // Aufruf einer Wiederkehrenden Kommunikationsnachricht
 //        send_current();      // Motorstrom ueber UART senden
-        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
+//        send_motor_stat();      // Drehzahl und Motorstrom ueber UART senden
 //        send_drehwinkel();    // Drehwinkel ueber UART senden
-//        send_control_2_ADval();     // Wert des Pins 2 des Control-Anschlusses ueber UART senden
+        send_control_2_ADval();     // Wert des Pins 2 des Control-Anschlusses ueber UART senden
     }
 }
