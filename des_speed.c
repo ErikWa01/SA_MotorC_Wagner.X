@@ -33,7 +33,7 @@ void calc_duty_from_AD()
         des_volt_pos = 0;
         des_duty_val = ADval - 1800;    // Tastgrad zwischen 1 und x (Alle Werte > 1598 werden als Maximalwert interpretiert)
     }else{
-        des_duty_val = 0;               // Werte zwischen 1599 und 1800 --> Mittelstellung --> Spannung 0
+        des_duty_val = 0;               // Werte zwischen 1598 und 1800 --> Mittelstellung --> Spannung 0
     }
 }
 

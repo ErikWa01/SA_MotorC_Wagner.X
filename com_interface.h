@@ -20,6 +20,7 @@ extern "C" {
     void send_drehwinkel();
     void send_control_2_ADval();
     int itoa(int value, char *str, int is_signed);
+    int add_to_string(char *dest, char *source, int size);
 
 
 #ifdef	__cplusplus

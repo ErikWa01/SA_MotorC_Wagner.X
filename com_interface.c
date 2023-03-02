@@ -16,6 +16,7 @@ char msg_tx[100]; // Pointer für char-Arrays, zum Speichern der zusendenden Nach
 char *msg_rx; // Pointer für char-Arrays, zum Speichern einer empfangenen Nachricht
 float msg_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 int string_ende;        // Variable zum Speichern der Laufvariable, die auf das Ende des msg-Strings zeigt
+int n_soll;
 
 // Funktion zur Initialisierung der Kommunikationssteuerung
 void com_interface_init()
@@ -73,20 +74,23 @@ void send_motor_stat()
 {
     int tmp_ende;           // Variable zum Speichern der Laufvariable, die auf das Ende des tmp-Strings zeigt
     char tmp[50];           // tmp-String --> Zusaetzlicher String zum Speichern der Drehzahl
-    int i;                  // Laufvariable for-Schleife
+ 
 
-    string_ende = itoa(get_drehzahl(), msg_tx, 1); // Speichere Drehzahl in msg_tx
-    msg_tx[string_ende++] = '\n';                   // Zeilenumbruch
-    tmp_ende = itoa(get_I_motor_ADval(), tmp, 1);  // Speichere Motorstrom in einem zusaetzlichem String
+    n_soll = (get_des_duty_val()*369L)/1598;
+    string_ende = add_to_string(msg_tx, "LL n soll: ", 11);
     
-    // Fuege zusaetzlichen String zu msg_tx hinzu
-    for(i = 0; i < tmp_ende; i++)   
-    {
-        msg_tx[string_ende++] = tmp[i];
-    }
+    tmp_ende = itoa(n_soll, tmp, 1);
+    string_ende += add_to_string(&msg_tx[string_ende], tmp, tmp_ende);
+    string_ende += add_to_string(&msg_tx[string_ende], "\nn ist: ", 8);
+            
+    tmp_ende = itoa(get_drehzahl(), tmp, 1);                             // Speichere Drehzahl in tmp
+    string_ende += add_to_string(&msg_tx[string_ende], tmp, tmp_ende);    // Fuege tmp an msg_tx an
+    string_ende += add_to_string(&msg_tx[string_ende], "\nI ist: ", 8);
+    
+    tmp_ende = itoa(get_I_motor_ADval(), tmp, 1);  // Speichere Motorstrom in einem zusaetzlichem String
+    string_ende += add_to_string(&msg_tx[string_ende], tmp, tmp_ende);
     
     msg_tx[string_ende++] = '\n';   // Zeilenumbruch
-    msg_tx[string_ende++] = '-';    // Markierung, visuelles Nachrichtende
     msg_tx[string_ende++] = '\n';   // Zeilenumbruch
     msg_tx[string_ende] = '\0';     // Technisches Nachrichtende
     
@@ -162,4 +166,28 @@ int itoa(int value, char *str, int is_signed)
     str[i] = '\0';      // Setzen des Ende des Strings
     
     return i;           // Rueckgabe der Variable, die auf das Ende des Strings zeigt
+}
+
+/* Funktion zum anhaengen eines Strings an einen anderen String
+ *
+ * Übergabeparameter:
+ *  - dest: pointer auf die letzte beschriebene Stelle des Zielstrings
+ *  - source: pointer auf die Anfangsadresse des einzufuegenden Strings
+ *  - size: Laenge des einzufuegenden Strings
+ * 
+ * Rückgabeparameter:
+ *  - Anzahl hinzugefuegter Zeichen (int)
+ */
+int add_to_string(char *dest, char *source, int size)
+{
+    int i;
+    
+    for(i = 0; i < size; i++)   
+    {
+        dest[i] = source[i];
+    }
+    
+    dest[i] = '\0';
+    
+    return i;
 }
