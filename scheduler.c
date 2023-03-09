@@ -37,7 +37,7 @@ void scheduler_init()
     tmr_count_task3 = 0;    // Initialisieren der Variable auf 0
     tmr_trig_task1 = 1;     // Aufruf des Task 1 nach 1 Timerdurchlauf (200 µs)
     tmr_trig_task2 = 50;    // Aufruf des Task 2 nach 50 Timerdurchlaeufen (10 ms)
-    tmr_trig_task3 = 50;  // Aufruf des Task 3 nach 500 Timerdurchlaeufen (10 ms)
+    tmr_trig_task3 = 2500;  // Aufruf des Task 3 nach 2500 Timerdurchlaeufen (500 ms)
     
     T1CONbits.TON = 1;      // Starten des Timers
 }
@@ -59,7 +59,6 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
         // Aufruf motor_stat und commutation
         calc_motor_position();
         motor_commutation();
-//        OVDCON = 0x0015;
     }
     
     // Aufrufen des ersten Task, wenn Zaehlervariable Endwert erreicht hat

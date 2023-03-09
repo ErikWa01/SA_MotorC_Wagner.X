@@ -12,26 +12,28 @@
 
 
 /* Deklaration von Variablen */
-char control_mode = 'a';
-int des_volt_pos = 1;
-int des_duty_val;
-int des_volt_pos_a = 1;
-int des_duty_val_a;
-int des_volt_pos_d = 1;
-int des_duty_val_d = 0;
-int n_LL_soll;
+char control_mode = 'a';    // Variable zum Festlegen, ob Controlmode Analog 'a' oder Digital 'd'
+int des_volt_pos = 1;       // Sollspannungs positiv 1 oder negativ 0
+int des_duty_val;           // Wert des Solltastgrads
+int des_volt_pos_a = 1;     
+int des_duty_val_a;         // Wert des Solltastgrads durch analogen Eingangspin bestimmt
+int des_volt_pos_d = 1;     // Spannungsrichtung durch UART-Uebertragung bestimmt
+int des_duty_val_d = 0;     // Wert des Solltastgrads durch UART-Uebertragung bestimmt
+int n_LL_soll;              // Wert der Leerlaufsolldrehzahl --> Berechnet anhand Tastgrad
 
+// Funktion zur zyklischen Bestimmung des neuen Solltastgrades
 void calc_new_duty_val()
 {
-    if(control_mode == 'a')
+    // Bestimmung, je nachdem ob Controlmode analog oder digital
+    if(control_mode == 'a')     // Analog
     {
-        calc_duty_from_AD();
-        des_duty_val = des_duty_val_a;
-        des_volt_pos = des_volt_pos_a;
-    }else if(control_mode == 'd')
+        calc_duty_from_AD();    // Rufe analoge Solltastgradbestimmung auf
+        des_duty_val = des_duty_val_a;  // setze neuen Tastgrad
+        des_volt_pos = des_volt_pos_a;  // setze neue Spannungsrichtung
+    }else if(control_mode == 'd')   // Digital
     {
-        des_duty_val = des_duty_val_d;
-        des_volt_pos = des_volt_pos_d;
+        des_duty_val = des_duty_val_d;  // setze neuen Tastgrad
+        des_volt_pos = des_volt_pos_d;  // setze neue Spannungsrichtung
     }
 }
 
@@ -54,18 +56,6 @@ void calc_duty_from_AD()
         des_duty_val_a = 0;               // Werte zwischen 1598 und 1800 --> Mittelstellung --> Spannung 0
     }
 }
-
-//// Funktion zum setzen einer neuen Drehrichtung
-//void set_des_dir(char desRtg)
-//{
-//    if (desRtg != des_richtung)
-//    {
-//        //Kurzeitiges Verlangsamen des Motors
-//        des_speed = 0;
-//        // Aktualisierung der Richtung
-//        des_richtung = desRtg;
-//    }
-//}
 
 // Funktion zum setzen eines neuen Tastgrades mit ditigaler Steueurung
 void set_des_duty_val_d(int des_duty_val)
@@ -106,16 +96,13 @@ void set_volt_pos_d(char desVoltDir)
     }
 }
 
-//char getDesRichtung()
-//{
-//    return des_richtung;
-//}
-
+// Rueckgabe des Solltastgrads
 int get_des_duty_val()
 {
     return des_duty_val;
 }
 
+// Rueckgabe der Sollspannungsrichtung
 int des_volt_is_pos()
 {
     return des_volt_pos;
@@ -124,7 +111,7 @@ int des_volt_is_pos()
 // Bestimmung der Leerlaufsolldrehzahl anhand Tastgrad
 int get_n_LL_soll()
 {
-    des_duty_val = (des_duty_val > 1598) ? 1598 : des_duty_val;
-    n_LL_soll = (des_duty_val*371L)/1598;
-    n_LL_soll = (des_volt_pos == 0) ? -n_LL_soll : n_LL_soll;    
+    des_duty_val = (des_duty_val > 1598) ? 1598 : des_duty_val; // Ist Tastgradwert hoeher als Maximalwert, wird dieser auf Maximalwert beschraenkt
+    n_LL_soll = (des_duty_val*371L)/1598;                       // Berechnung der Sollspannung
+    n_LL_soll = (des_volt_pos == 0) ? -n_LL_soll : n_LL_soll;   // Wenn Spannungsrichtung negativ, Sollspannung negativ
 }

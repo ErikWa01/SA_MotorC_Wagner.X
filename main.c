@@ -73,7 +73,7 @@ int main() {
     scheduler_init();       // Initialisierung des Timers fuer zeitgesteuerte Funktionsaufrufe
 //    temp = ADCBUF0;
 
-    /** Folgender Code ist fuer die Bestimmung des Oszillator-Taktes
+    /** Folgender Code ist fuer die Bestimmung des Oszillator-Taktes --> nicht mehr benoetigt
 //    TRISDbits.TRISD2 = 0;   // Pin D2, gleichbedeutend mit OSC3 ist Output
 //    T2CONbits.TCS = 0;      // Interne Zeitbasis: TCY
 //    T2CONbits.T32 = 0;      // 16 Bit Timer

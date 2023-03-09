@@ -106,25 +106,6 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         }else{
             drehwinkel_valid = 1;
         }
-//        // Tiefpass --> ueber 6 Hallaenderungen --> 1 Kommutierungszyklus
-//        timer_val_array[0] = timer_val;             // Speichern des zuletzt gelesenen Wertes
-//        if(val_count < 6)                           // val_count ist entweder Anzahl der geschriebenen Werte oder maximal 6
-//        {
-//            val_count++;                            // Ein weiterer Wert wurde geschrieben
-//        }else{
-//            drehwinkel_valid = 1;                   // Erst wenn 6 Werte geschrieben wurden --> Also 1 Kommutierugszyklus durchlaufen ist kann Drehwinkel als gueltig bestimmt angesehen werden
-//        }
-//        time_hall_change = 0;                       // Ruecksetzen des Ausgangs des Tiefpass
-//        for(i = 0; i < val_count; i++)
-//        {
-//            time_hall_change += timer_val_array[i] / val_count;     // Ausgang des Tiefpass (Zeit, zwischen zwei Hallsensorwechseln) ist gemittelter Wert ueber
-//        }                                                           // die Anzahl der bisher geschriebenen Werte oder maximal 6
-//        // Verschieben der Werte im Tiefpass-Array um 1 nach hinten
-//        for(i = 0; i < 5; i++)
-//        {
-//            timer_val_array[i+1] = timer_val_array[i];
-//        }
-//        //Ende Tiefpass
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];         // Bestimmung des aktuellen elektrischen Drehwinkels anhand Hallstatus
         hallsensor_flag = 1;                                           // Drehwinkel zuletzt durch Interrupt bestimmt
@@ -132,7 +113,6 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         // Bestimmung der Richtung
         direction = (drehwinkel_difference > 0) ? 0 : 1;         // Wenn Differenz > 0, dann ist Richung vorw‰rts (rechtslauf, 0), sonst rueckwaerts (linkslauf, 1)
         
-//        drehwinkel_valid = 1;                     // Drehwinkel wurde gueltig bestimmt
         last_drehwinkel = drehwinkel;               // Speichern des aktuellen Drehwinkels als alten Drehwinkelwert
         
         // Neuer Endwert des Timers --> Ueberlauf des Timers soll verhindern, dass durch Programm bestimmter Drehwinkel dem tatsaechlichen weit voraus ist und somit Kommutierung falsch laeuft
@@ -196,6 +176,7 @@ int read_HallSensors()
     return (PORTB & 0x0038) >> 3;    // Lesen der Zust√§nde der Hall-Sensoren und direktes Verschieben der Bits um drei nach rechts
 }
 
+// Rueckgabe aktuelle Drehzahl
 int get_drehzahl()
 {
     drehzahl = (3 * FCY * 60) / (time_hall_change * 360);
@@ -207,16 +188,19 @@ int get_drehzahl()
     return drehzahl;
 }
 
+// Rueckgabe aktueller elektrischer Drehwinkel
 int get_drehwinkel()
 {
     return drehwinkel;
 }
 
+// Rueckgabe, ob Drehwinkel gueltig bestimmt wurde
 int drehwinkel_is_valid()
 {
     return drehwinkel_valid;
 }
 
+// Rueckgabe aktuellen Drehrichtung
 int get_direction()
 {
     return direction;
