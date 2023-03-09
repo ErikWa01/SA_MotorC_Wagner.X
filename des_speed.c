@@ -19,6 +19,7 @@ int des_volt_pos_a = 1;
 int des_duty_val_a;
 int des_volt_pos_d = 1;
 int des_duty_val_d = 0;
+int n_LL_soll;
 
 void calc_new_duty_val()
 {
@@ -118,4 +119,12 @@ int get_des_duty_val()
 int des_volt_is_pos()
 {
     return des_volt_pos;
+}
+
+// Bestimmung der Leerlaufsolldrehzahl anhand Tastgrad
+int get_n_LL_soll()
+{
+    des_duty_val = (des_duty_val > 1598) ? 1598 : des_duty_val;
+    n_LL_soll = (des_duty_val*371L)/1598;
+    n_LL_soll = (des_volt_pos == 0) ? -n_LL_soll : n_LL_soll;    
 }

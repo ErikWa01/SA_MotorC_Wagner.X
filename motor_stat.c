@@ -26,6 +26,7 @@ unsigned long timer_endval;             // Variable zum Setzen des neuen Endwert
 unsigned long time_hall_change;         // Variable zum Speichern des gefilterten Wertes der vergangenen Zeit zwischen zwei Hallsensoren
 unsigned long time_since_hall;          // Variable zum Auslesen der Zeit, die seit einem Hallsensorinterrupt vergangen ist
 unsigned long time_since_hall_temp;     // Variable zum temporaeren Speichern der MSW der time_since_hall-Variable
+int hallsensor_flag;                    // Flag zur Auswertung, ob Drehwinkel zuletzt durch Hallsensorinterrupt festgelegt wurde
 int drehwinkel_array[6];   // Array welches fuer den jeweiligen gewandelten Hallsensorstatus den entsprechenden Wert des Drehwinkels gespeichert hat
 
 
@@ -56,6 +57,7 @@ void motor_stat_init() {
     first_call = 1;
     val_count = 0;
     time_hall_change = 0xFFFFFFFF;
+    hallsensor_flag = 0;
     
     // drehwinkel_array fuellen
     drehwinkel_array[0] = 0xD555;       // Hallstatus 1: In Kommutierungsreihenfolge Platz 5 --> 300°
@@ -84,6 +86,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         PR2 = 0x3E00;       // des Timers auf 300 ms            (LSW)
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];          // Zuweisung des entsprechenden Drehwinkels zum Start der Drehbewegung
+        hallsensor_flag = 1;                                            // Drehwinkel zuletzt durch Interrupt bestimmt
         last_drehwinkel = drehwinkel;                                   // Speichern des alten Drehwinkelwertes
         
         first_call = 0;     // Interrupt wurde einmal aufgerufen
@@ -124,6 +127,7 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
 //        //Ende Tiefpass
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];         // Bestimmung des aktuellen elektrischen Drehwinkels anhand Hallstatus
+        hallsensor_flag = 1;                                           // Drehwinkel zuletzt durch Interrupt bestimmt
         drehwinkel_difference = drehwinkel - last_drehwinkel;          // Bestimmung der Differenz aus aktuellem und neuem
         // Bestimmung der Richtung
         direction = (drehwinkel_difference > 0) ? 0 : 1;         // Wenn Differenz > 0, dann ist Richung vorwärts (rechtslauf, 0), sonst rueckwaerts (linkslauf, 1)
@@ -147,23 +151,25 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
  * muss alle 200 µs aufgerufen werden --> tcalc = 3200 * Tcy */
 void calc_motor_position()
 {
-    // Auslesen der Zeit, die seit dem letzten Hallsensorinterrupt vergangen ist
-    time_since_hall = TMR2;                             // Auslesen des LSW der Zeit seit dem letzten Hallsensorinterrupt
-    time_since_hall_temp = TMR3HLD;                     // MSW Speichern
-    time_since_hall += (time_since_hall_temp << 16);    // Gesamtwert berechnen
-    
-    // Wenn die Zeit kleiner als 200 µs ist, dann kann nicht die 200 µs Zykluszeit zur Berechnung des vergangenen Drehwinkels angenommen werden
-    // Es muss stattdessen die vergangene Zeit berücksichtigt werden
-    if(time_since_hall < 3200)
+    // Prüfen ob zwischen dem letzten und dem aktuellen Aufruf der Funktion Drehwinkel durch Hallsensorinterrupt festgelegt wurde
+    if(hallsensor_flag)
     {
+        // Zeit < 200 µs muss beachtet werden
+        // Auslesen der Zeit, die seit dem letzten Hallsensorinterrupt vergangen ist
+        time_since_hall = TMR2;                             // Auslesen des LSW der Zeit seit dem letzten Hallsensorinterrupt
+        time_since_hall_temp = TMR3HLD;                     // MSW Speichern
+        time_since_hall += (time_since_hall_temp << 16);    // Gesamtwert berechnen
+        
         if(direction == 0)
         {
             drehwinkel += (time_since_hall * 10923)/time_hall_change;     // drehwinkel += (time_since_hall * Tcy / x * Tcy) * 60° --> time_since_hall * 10923 / x
         }else if(direction == 1){
             drehwinkel -= (time_since_hall * 10923)/time_hall_change;     // Richtung rueckwaerts --> Drehwinkel wird verringert
         }
+        
+        hallsensor_flag = 0;
     }else{
-        // Ist die Zeit größer oder gleich 200 µs kann die Zykluszeit des Aufrufs der Berechnungsfunktion (200 µs) fuer die Berechung verwendet werden
+        // Wurde Winkel zuletzt durch zyklische Funktion bestimmt kann von 200 µs als vergangene Zeit ausgegangen werden
         if(direction == 0)
         {
             drehwinkel += 34953600L/time_hall_change;     // drehwinkel += (3200 * Tcy / x * Tcy) * 60° --> 3200 * 10923 / x

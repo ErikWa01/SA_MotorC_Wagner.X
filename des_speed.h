@@ -22,6 +22,7 @@ extern "C" {
     void set_des_duty_val_d(int des_duty_val);
     void set_control_mode(char des_mode);
     void set_volt_pos_d(char desVoltDir);
+    int get_n_LL_soll();
 
 #ifdef	__cplusplus
 }

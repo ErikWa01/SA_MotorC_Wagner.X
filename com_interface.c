@@ -16,7 +16,6 @@ char msg_tx[100]; // Pointer für char-Arrays, zum Speichern der zusendenden Nach
 char *msg_rx; // Pointer für char-Arrays, zum Speichern einer empfangenen Nachricht
 float msg_duty_val;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 int string_ende;        // Variable zum Speichern der Laufvariable, die auf das Ende des msg-Strings zeigt
-int n_soll;
 
 // Funktion zur Initialisierung der Kommunikationssteuerung
 void com_interface_init()
@@ -81,10 +80,8 @@ void send_motor_stat()
     char tmp[50];           // tmp-String --> Zusaetzlicher String zum Speichern der Drehzahl
  
 
-    n_soll = (get_des_duty_val()*369L)/1598;
     string_ende = add_to_string(msg_tx, "LL n soll: ", 11);
-    
-    tmp_ende = itoa(n_soll, tmp, 1);
+    tmp_ende = itoa(get_n_LL_soll(), tmp, 1);
     string_ende += add_to_string(&msg_tx[string_ende], tmp, tmp_ende);
     string_ende += add_to_string(&msg_tx[string_ende], "\nn ist: ", 8);
             
