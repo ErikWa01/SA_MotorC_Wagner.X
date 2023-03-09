@@ -17,7 +17,6 @@
 #define VKOMW 0x0E39;          // Definition des Kommutierungswinkels bei Vorkommutierung --> Wenn 0, dann keine Vorkommutierung
 
 char richtung;
-char control_mode;
 int duty_val;
 float speed;
 int el_drehwinkel;
@@ -51,7 +50,6 @@ void PWM_Init() {
 
 void motor_commutation()
 {
-    control_mode = get_des_control_mode();
     duty_val = get_des_duty_val();
     richtung = get_direction();
     volt_pos = des_volt_is_pos();

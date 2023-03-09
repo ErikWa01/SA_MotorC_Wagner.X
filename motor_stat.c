@@ -125,7 +125,6 @@ void __attribute__((interrupt, no_auto_psv)) _CNInterrupt (void)
         
         drehwinkel = drehwinkel_array[read_HallSensors() - 1];         // Bestimmung des aktuellen elektrischen Drehwinkels anhand Hallstatus
         drehwinkel_difference = drehwinkel - last_drehwinkel;          // Bestimmung der Differenz aus aktuellem und neuem
-        
         // Bestimmung der Richtung
         direction = (drehwinkel_difference > 0) ? 0 : 1;         // Wenn Differenz > 0, dann ist Richung vorwärts (rechtslauf, 0), sonst rueckwaerts (linkslauf, 1)
         

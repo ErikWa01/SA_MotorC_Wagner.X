@@ -66,7 +66,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void)
     if(tmr_count_task2 == tmr_trig_task2)
     {
         tmr_count_task2 = 0; // Ruecksetzen der Zaehlervariable
-        calc_duty_from_AD();
+        calc_new_duty_val();
     }
     
     // Aufrufen des ersten Task, wenn Zaehlervariable Endwert erreicht hat

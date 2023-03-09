@@ -75,7 +75,7 @@ int main() {
 
     /** Folgender Code ist fuer die Bestimmung des Oszillator-Taktes
 //    TRISDbits.TRISD2 = 0;   // Pin D2, gleichbedeutend mit OSC3 ist Output
-//    T2CONbits.TCS = 0;      // Interne Zeitbasis: Fosc/4
+//    T2CONbits.TCS = 0;      // Interne Zeitbasis: TCY
 //    T2CONbits.T32 = 0;      // 16 Bit Timer
 //    T2CONbits.TCKPS = 0;    // Prescale 1:1
 //    PR2 = 1599;              // Zuruecksetzen des Timers nach 1599+1 * 62,5 ns = 100 µs

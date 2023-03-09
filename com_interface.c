@@ -14,7 +14,7 @@
 // Variablendeklaration
 char msg_tx[100]; // Pointer f�r char-Arrays, zum Speichern der zusendenden Nachrichten
 char *msg_rx; // Pointer f�r char-Arrays, zum Speichern einer empfangenen Nachricht
-float msg_speed;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
+float msg_duty_val;    // Variable zum Speichern der gesendeten Sollgeschwindigkeit
 int string_ende;        // Variable zum Speichern der Laufvariable, die auf das Ende des msg-Strings zeigt
 int n_soll;
 
@@ -28,28 +28,33 @@ void com_interface_init()
 void handle_msg_rx(char *msg)
 {
     msg_rx = msg;
-    // Falls 'msg_rx[0]' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
-    if (msg_rx[0] == 118 || msg_rx[0] == 114) {
-        set_des_dir(msg_rx[0]);
-    } 
-    // Enthaelt msg_rx[0] den Buchstaben b oder s wird Modus Bremsstufe oder Geschwindigkeit (Speed) ausgew�hlt
-    else if(msg_rx[0] == 98 || msg_rx[0] == 115){
-        set_des_control_mode(msg_rx[0]);
-    }
+//    // Falls 'msg_rx[0]' den Buchstaben 'v' (vorwärts) oder 'r' (rückwärts) enthält, dann...
+//    if (msg_rx[0] == 118 || msg_rx[0] == 114) {
+//        set_des_dir(msg_rx[0]);
+//    } 
+//    // Enthaelt msg_rx[0] den Buchstaben b oder s wird Modus Bremsstufe oder Geschwindigkeit (Speed) ausgew�hlt
+//    else if(msg_rx[0] == 98 || msg_rx[0] == 115){
+//        set_des_control_mode(msg_rx[0]);
+//    }
+    
     // Enthaelt msg_rx[0] das Zeichen '-' ist Sollspannung negativ anzusehen, bei '+' positiv
-    else if(msg_rx[0] == '-' || msg_rx[0] == '+')
+    if(msg_rx[0] == '-' || msg_rx[0] == '+')
     {
-        set_volt_pos(msg_rx[0]);
+        set_volt_pos_d(msg_rx[0]);
+    // Enthaelt msg_rx[0] das Zeichen 'a' ist gewuenschter Controlmode analog, bei 'd' digital
+    }else if(msg_rx[0] == 'a' || msg_rx[0] == 'd')
+    {
+        set_control_mode(msg_rx[0]);
     }
-    // Falls 'msg_rx[0]' keine der Buchstaben 'v', 'r', 'b' oder 's' enthält, könnte Befehl eine Geschwindigkeitsänderung sein...
+    // Falls 'msg_rx[0]' keine der Zeichen '-', '+', 'a' oder 'd' enthaelt, koennte Befehl eine Tastgradaenderung sein
     else
     {
         // Umwandlung von char 'msg_rx[0]' in eine float-Variable 'msg_speed'
-        msg_speed = msg_rx[0] - 48;
+        msg_duty_val = (float)(msg_rx[0] - 48);
 
-        // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gewünschte Geschwindigkeitsänderung gesendet
-        if (msg_speed >= 0 && msg_speed <= 9) {
-            set_des_speed(msg_speed);   // Aktualisierung der Sollgeschwindigkeit
+        // Falls Befehl eine Zahl im Bereich von 0 und 9 beschreibt, dann hat der Benutzer eine gewuenschte Tastgradaenderung gesendet
+        if (msg_duty_val >= 0 && msg_duty_val <= 9) {
+            set_des_duty_val_d(msg_duty_val);   // Aktualisierung des Solltastgrades
         }
     }
 }
